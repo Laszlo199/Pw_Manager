@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pw_WebApi", "Pw_WebApi\Pw_W
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pw_Security", "Pw_Security\Pw_Security.csproj", "{64308AB6-30A3-4742-9443-3E13788049FA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pw_Manager", "Pw_Manager\Pw_Manager.csproj", "{68874B58-C237-4C20-A94C-01701CF44D3A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,6 +20,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{54489397-5F86-46D0-B57C-6F5A28AC50D0} = {3BE84E8A-9A0B-4A70-BE3D-47ADE0983B2B}
 		{64308AB6-30A3-4742-9443-3E13788049FA} = {B41C17A3-E9C7-4217-A3C3-D63C1B464223}
+		{68874B58-C237-4C20-A94C-01701CF44D3A} = {5FB1FF0A-537D-45F1-A4A0-3E1648203AC7}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{54489397-5F86-46D0-B57C-6F5A28AC50D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -28,5 +31,9 @@ Global
 		{64308AB6-30A3-4742-9443-3E13788049FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{64308AB6-30A3-4742-9443-3E13788049FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{64308AB6-30A3-4742-9443-3E13788049FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68874B58-C237-4C20-A94C-01701CF44D3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68874B58-C237-4C20-A94C-01701CF44D3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68874B58-C237-4C20-A94C-01701CF44D3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68874B58-C237-4C20-A94C-01701CF44D3A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
