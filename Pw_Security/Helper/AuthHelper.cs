@@ -8,28 +8,29 @@ public class AuthHelper: IAuthHelper
 {
     public void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
     {
-        // Generate a random salt (16 bytes recommended for Argon2id)
+        // Generate salt (16 bytes)
         passwordSalt = new byte[16];
         using (var rng = new RNGCryptoServiceProvider())
         {
             rng.GetBytes(passwordSalt);
         }
 
-// Initialize the Argon2id hasher
+        // Argon2id hasher
         using (var argon2 = new Argon2id(Encoding.UTF8.GetBytes(password)))
         {
             argon2.Salt = passwordSalt;
 
-            // Perform the hashing
-            argon2.DegreeOfParallelism = 8; // four cores
+            // hashing
+            argon2.DegreeOfParallelism = 8; // cores
             argon2.Iterations = 4;
-            passwordHash = argon2.GetBytes(64); // 64 bytes
+            argon2.MemorySize = 65536; //Have to be bigger than 4kB lol
+            passwordHash = argon2.GetBytes(64); 
         }
     }
 
     public bool VerifyPasswordHash(string password, byte[] storedHash, byte[] storedSalt)
     {
-        // Initialize the Argon2id verifier
+        //Argon2id verifier
         using (var verifier = new Argon2id(Encoding.UTF8.GetBytes(password)))
         {
             verifier.Salt = storedSalt;
