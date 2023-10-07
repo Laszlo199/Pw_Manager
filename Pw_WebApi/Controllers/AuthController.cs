@@ -17,14 +17,15 @@ public class AuthController : ControllerBase
     }
         
     // POST: api/Login
-    [AllowAnonymous] //people cant log in not being logged in
+    //[AllowAnonymous] 
     [HttpPost(nameof(Login))]
     public ActionResult<TokenDto> Login([FromBody] LoginDto loginDto)
     {
         throw new NotImplementedException();
     }
-        
-    [AllowAnonymous]
+    
+    // POST: api/Login   
+    //[AllowAnonymous]
     [HttpPost(nameof(Register))]
     public ActionResult<TokenDto> Register([FromBody] LoginDto loginDto)
     {
