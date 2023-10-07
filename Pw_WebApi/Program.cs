@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Pw_Security.Db;
 using Pw_Security.Helper;
 using Pw_Security.IRepository;
@@ -19,11 +20,26 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthHelper, AuthHelper>();
 builder.Services.AddScoped<SecuritySeeder>();
 
+builder.Services.AddDbContext<SecurityContext>(options => { options.UseSqlite("Data Source = auth.db"); });
+builder.Services.AddTransient<SecuritySeeder>();
 
 
 
 
 var app = builder.Build();
+
+AuthSeeder(app);
+
+void AuthSeeder(IHost app)
+{
+    var scopedFactory = app.Services.GetService<IServiceScopeFactory>();
+
+    using (var scope = scopedFactory.CreateScope())
+    {
+        var service = scope.ServiceProvider.GetService<SecuritySeeder>();
+        service.SeedDevelopment();
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
