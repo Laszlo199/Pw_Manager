@@ -19,10 +19,10 @@ public class AuthHelper: IAuthHelper
         using (var argon2 = new Argon2id(Encoding.UTF8.GetBytes(password)))
         {
             argon2.Salt = passwordSalt;
-
+            argon2.Iterations = 4;
             // hashing
             argon2.DegreeOfParallelism = 8; // cores
-            argon2.Iterations = 4;
+            
             argon2.MemorySize = 65536; //Have to be bigger than 4kB lol
             passwordHash = argon2.GetBytes(64); 
         }
@@ -30,24 +30,42 @@ public class AuthHelper: IAuthHelper
 
     public bool VerifyPasswordHash(string password, byte[] storedHash, byte[] storedSalt)
     {
-        //Argon2id verifier
-        using (var verifier = new Argon2id(Encoding.UTF8.GetBytes(password)))
+        try
         {
-            verifier.Salt = storedSalt;
-
-            // Perform the verification
-            byte[] computedHashBytes = verifier.GetBytes(64); // 64 bytes is the size of the stored hash
-
-            // Compare the computed hash with the stored hash
-            for (int i = 0; i < computedHashBytes.Length; i++)
+            // Argon2id verifier
+            using (var verifier = new Argon2id(Encoding.UTF8.GetBytes(password)))
             {
-                if (computedHashBytes[i] != storedHash[i])
-                {
-                    return false;
-                }
-            }
+                verifier.Salt = storedSalt;
 
-            return true;
+                // Perform the verification
+                byte[] computedHashBytes = verifier.GetBytes(64); // 64 bytes is the size of the stored hash
+
+                // Use constant-time comparison to compare hashes
+                return ConstantTimeAreEqual(computedHashBytes, storedHash);
+            }
         }
+        catch (Exception)
+        {
+            // Handle exceptions, such as invalid Argon2 parameters or salt
+            return false;
+        }
+    }
+
+// Constant-time comparison function
+    private bool ConstantTimeAreEqual(byte[] a, byte[] b)
+    {
+        if (a == null || b == null || a.Length != b.Length)
+        {
+            return false;
+        }
+
+        bool areEqual = true;
+
+        for (int i = 0; i < a.Length; i++)
+        {
+            areEqual &= (a[i] == b[i]);
+        }
+
+        return areEqual;
     }
 }
