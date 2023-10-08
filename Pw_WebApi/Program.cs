@@ -1,9 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Pw_Manager.Db;
-using Pw_Manager.IRepository;
-using Pw_Manager.IServices;
-using Pw_Manager.Repository;
-using Pw_Manager.Services;
 using Pw_Security.Db;
 using Pw_Security.Helper;
 using Pw_Security.IRepository;
@@ -20,15 +15,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-//Manager
-builder.Services.AddScoped<IManagerService, ManagerService>();
-builder.Services.AddScoped<IManagerRepository, ManagerRepository>();
-builder.Services.AddScoped<ManagerSeeder>();
-
-builder.Services.AddDbContext<PwManagerContext>(options => { options.UseSqlite("Data Source = manager.db"); });
-builder.Services.AddTransient<ManagerSeeder>();
-
-//Security
 builder.Services.AddScoped<ISecurityService, SecurityService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthHelper, AuthHelper>();
@@ -43,7 +29,6 @@ builder.Services.AddTransient<SecuritySeeder>();
 var app = builder.Build();
 
 AuthSeeder(app);
-ManagerSeeder(app);
 
 void AuthSeeder(IHost app)
 {
@@ -52,17 +37,6 @@ void AuthSeeder(IHost app)
     using (var scope = scopedFactory.CreateScope())
     {
         var service = scope.ServiceProvider.GetService<SecuritySeeder>();
-        service.SeedDevelopment();
-    }
-}
-
-void ManagerSeeder(IHost app)
-{
-    var scopedFactory = app.Services.GetService<IServiceScopeFactory>();
-
-    using (var scope = scopedFactory.CreateScope())
-    {
-        var service = scope.ServiceProvider.GetService<ManagerSeeder>();
         service.SeedDevelopment();
     }
 }
