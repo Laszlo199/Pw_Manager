@@ -1,5 +1,6 @@
 ﻿namespace Pw_Manager.Model;
 
+
 public class PasswordsModel
 {
     public int Id { get; set; }

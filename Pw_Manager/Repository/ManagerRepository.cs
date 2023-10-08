@@ -1,4 +1,5 @@
-﻿using Pw_Manager.Db;
+﻿using Microsoft.EntityFrameworkCore;
+using Pw_Manager.Db;
 using Pw_Manager.IRepository;
 using Pw_Manager.Model;
 
@@ -19,7 +20,21 @@ public class ManagerRepository: IManagerRepository
 
     public PasswordsModel Create(PasswordsModel newPassword)
     {
-        throw new NotImplementedException();
+        var model = new PasswordsModel()
+        {
+            WebsiteName = newPassword.WebsiteName,
+            Email = newPassword.Email,
+            Password = newPassword.Password,
+            UserId = newPassword.UserModel.Id,
+            UserModel = new User()
+            {
+                Id = 
+            }
+            
+        };
+        _ctx.Cards.Attach(newEntity).State = EntityState.Added;
+        _ctx.SaveChanges();
+        return newCard;
     }
 
     public PasswordsModel Delete(int passwordId)
