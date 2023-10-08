@@ -9,7 +9,7 @@ namespace Pw_Security.Repositories;
 public class UserRepository: IUserRepository
 {
     private readonly SecurityContext _context;
-    private readonly PwManagerContext PwManagerContext;
+    private readonly PwManagerContext _pwManagerContext;
     
 
     public UserRepository(SecurityContext context)

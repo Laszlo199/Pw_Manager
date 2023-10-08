@@ -7,11 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="IRepository\" />
-      <Folder Include="IServices\" />
-      <Folder Include="Model\" />
-      <Folder Include="Repository\" />
-      <Folder Include="Services\" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.11" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
     </ItemGroup>
 
 </Project>
