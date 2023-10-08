@@ -63,13 +63,13 @@ public class SecurityService: ISecurityService
         };
     }
 
-    public bool Create(string loginDtoEmail, string loginDtoPassword)
+    public bool Create(string email, string password)
     {
-        _authenticationHelper.CreatePasswordHash(loginDtoPassword,
+        _authenticationHelper.CreatePasswordHash(password,
             out var hash, out var salt);
         return _repo.Create(new User
         {
-            Email = loginDtoEmail,
+            Email = email,
             PasswordHash = hash,
             PasswordSalt = salt
         });

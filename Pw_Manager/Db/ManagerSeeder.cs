@@ -1,4 +1,5 @@
-﻿using Pw_Manager.Models;
+﻿using Pw_Manager.Db.Entity;
+using Pw_Manager.Models;
 
 namespace Pw_Manager.Db;
 
@@ -16,7 +17,7 @@ public class ManagerSeeder
         _context.Database.EnsureCreated();
         _context.SaveChanges();
         
-        _context.PasswordModel.Add(new PasswordModel()
+        _context.Passwords.Add(new PasswordModel()
         {
             UserId = 1,
             WebsiteName = "Gmail",

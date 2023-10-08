@@ -12,8 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="IRepository\" />
-      <Folder Include="Repository\" />
+      <ProjectReference Include="..\Pw_Security\Pw_Security.csproj" />
     </ItemGroup>
 
 </Project>

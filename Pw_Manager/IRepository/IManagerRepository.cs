@@ -1,8 +1,8 @@
 ﻿using Pw_Manager.Models;
 
-namespace Pw_Manager.IServices;
+namespace Pw_Manager.IRepository;
 
-public interface IManagerService
+public interface IManagerRepository
 {
     List<PasswordModel> GetAllPasswordsByUserId(int id);
     PasswordModel Create(PasswordModel newPassword);

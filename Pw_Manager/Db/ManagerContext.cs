@@ -9,5 +9,5 @@ public class ManagerContext: DbContext
     {
     }
 
-    public DbSet<PasswordModel> PasswordModel { get; set; }
+    public DbSet<PasswordModel> Passwords { get; set; }
 }

@@ -1,8 +1,9 @@
-﻿using Pw_Security.Db.Entity;
+﻿
+using Pw_Security.Db.Entity;
 
-namespace Pw_Manager.Models;
+namespace Pw_Manager.Db.Entity;
 
-public class PasswordModel
+public class PasswordEntity
 {
     public int Id { get; set; }
     public int UserId { get; set; }
@@ -11,4 +12,5 @@ public class PasswordModel
     public string Password { get; set; } 
     public DateTime DateCreated { get; set; }
     public User User { get; set; }
+    
 }
