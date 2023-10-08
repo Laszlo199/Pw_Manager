@@ -1,6 +1,6 @@
-﻿namespace Pw_Security.Db.Entity;
+﻿namespace DataAcces.Entity;
 
-public class User
+public class UserEntity
 {
     public int Id { get; set; }
     public string Email { get; set; }

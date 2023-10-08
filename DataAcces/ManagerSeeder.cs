@@ -1,6 +1,6 @@
-﻿using Pw_Manager.Model;
+﻿using DataAcces.Entity;
 
-namespace Pw_Manager.Db;
+namespace DataAcces;
 
 public class ManagerSeeder
 {
@@ -17,31 +17,33 @@ public class ManagerSeeder
         _context.Database.EnsureCreated();
         _context.SaveChanges();
 
-        var user1 = new UserModel()
+        var user1 = new UserEntity()
         {
-            Email = "user1"
+            Email = "user1",
+            PasswordHash = new byte[64],
+            PasswordSalt = new byte[64]
         };
 
         _context.Add(user1);
         
-        _context.Passwords.Add(new PasswordsModel()
+        _context.Passwords.Add(new PasswordEntity()
         {
             UserId = 1,
             WebsiteName = "Gmail",
             Email = "user1",
             Password = "asd123",
             DateCreated = DateTime.Today,
-            UserModel = user1,
+            UserEntity = user1,
         });
         
-        _context.Passwords.Add(new PasswordsModel()
+        _context.Passwords.Add(new PasswordEntity()
         {
             UserId = 1,
             WebsiteName = "Facebook",
             Email = "user1",
             Password = "Facebook",
             DateCreated = DateTime.Today,
-            UserModel = user1,
+            UserEntity = user1,
         });
         _context.SaveChanges();
     }

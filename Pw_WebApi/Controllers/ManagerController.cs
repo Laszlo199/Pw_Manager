@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Pw_Manager.IServices;
+﻿using Core.IServices;
+using Microsoft.AspNetCore.Mvc;
 using Pw_WebApi.Dtos;
 
 namespace Pw_WebApi.Controllers;

@@ -1,6 +1,6 @@
-﻿namespace Pw_Manager.Model;
+﻿namespace DataAcces.Entity;
 
-public class PasswordsModel
+public class PasswordEntity
 {
     public int Id { get; set; }
     public int UserId { get; set; }
@@ -8,5 +8,5 @@ public class PasswordsModel
     public string Email { get; set; }
     public string Password { get; set; } 
     public DateTime DateCreated { get; set; }
-    public UserModel UserModel { get; set; }
+    public UserEntity UserEntity { get; set; }
 }

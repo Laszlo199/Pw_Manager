@@ -17,4 +17,10 @@
       </Reference>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="IRepository\" />
+      <Folder Include="Model\" />
+      <Folder Include="Services\" />
+    </ItemGroup>
+
 </Project>

@@ -1,12 +1,11 @@
+using Core.IServices;
+using DataAcces;
+using DataAcces.Repo;
+using Domain.IRepository;
+using Domain.Services;
 using Microsoft.EntityFrameworkCore;
-using Pw_Manager.Db;
-using Pw_Manager.IRepository;
-using Pw_Manager.IServices;
-using Pw_Manager.Repository;
-using Pw_Manager.Services;
 using Pw_Security.Db;
 using Pw_Security.Helper;
-using Pw_Security.IRepository;
 using Pw_Security.IServices;
 using Pw_Security.Repositories;
 using Pw_Security.Services;

@@ -1,10 +1,11 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Text;
+using Core.Models;
+using DataAcces.Entity;
+using Domain.IRepository;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using Pw_Security.Db.Entity;
 using Pw_Security.Helper;
-using Pw_Security.IRepository;
 using Pw_Security.IServices;
 using Pw_Security.Models;
 

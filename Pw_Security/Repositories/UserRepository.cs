@@ -1,8 +1,9 @@
-﻿using Pw_Manager.Db;
+﻿using Core.Models;
+using DataAcces;
+using DataAcces.Entity;
+using Domain.IRepository;
 using Pw_Manager.Model;
 using Pw_Security.Db;
-using Pw_Security.Db.Entity;
-using Pw_Security.IRepository;
 using Pw_Security.Models;
 
 namespace Pw_Security.Repositories;
@@ -20,7 +21,7 @@ public class UserRepository: IUserRepository
     }
     public List<User> GetAll()
     {
-        return _context.LoginUsers.Select(u => new User
+        return _context.LoginUsers.Select(u => new User()
         {
             Id = u.Id,
             Email = u.Email,
@@ -39,9 +40,11 @@ public class UserRepository: IUserRepository
         });
         _context.SaveChanges();
 
-        _pwManagerContext.users.Add(new UserModel()
+        _pwManagerContext.Users.Add(new UserEntity()
         {
-            Email = user.Email
+            Email = user.Email,
+            PasswordHash = user.PasswordHash,
+            PasswordSalt = user.PasswordSalt
         });
         _pwManagerContext.SaveChanges();
         return createdUser != null;

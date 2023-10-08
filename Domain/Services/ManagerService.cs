@@ -1,9 +1,8 @@
-﻿using Pw_Manager.Db;
-using Pw_Manager.IRepository;
-using Pw_Manager.IServices;
-using Pw_Manager.Model;
+﻿using Core.IServices;
+using Core.Models;
+using Domain.IRepository;
 
-namespace Pw_Manager.Services;
+namespace Domain.Services;
 
 public class ManagerService: IManagerService
 {
@@ -14,23 +13,23 @@ public class ManagerService: IManagerService
     {
         _repo = repo;
     }
-    public List<PasswordsModel> GetAllPasswordsByUserId(int userId)
+    public List<Passwords> GetAllPasswordsByUserId(int userId)
     {
         if (userId < 0) throw new InvalidDataException("userId cannot be less than 0");
         return _repo.GetAllPasswordsByUserId(userId);
     }
 
-    public PasswordsModel Create(PasswordsModel newPassword)
+    public Passwords Create(Passwords newPassword)
     {
         throw new NotImplementedException();
     }
 
-    public PasswordsModel Delete(int passwordId)
+    public Passwords Delete(int passwordId)
     {
         throw new NotImplementedException();
     }
 
-    public PasswordsModel Update(PasswordsModel password)
+    public Passwords Update(Passwords password)
     {
         throw new NotImplementedException();
     }
