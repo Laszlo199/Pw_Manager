@@ -7,4 +7,5 @@ namespace Pw_WebApi.Controllers;
 public class ManagerController: ControllerBase
 {
     
+    
 }
