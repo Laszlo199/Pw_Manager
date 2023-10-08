@@ -33,6 +33,16 @@ public class ManagerSeeder
             DateCreated = DateTime.Today,
             UserModel = user1,
         });
+        
+        _context.Passwords.Add(new PasswordsModel()
+        {
+            UserId = 1,
+            WebsiteName = "Facebook",
+            Email = "user1",
+            Password = "Facebook",
+            DateCreated = DateTime.Today,
+            UserModel = user1,
+        });
         _context.SaveChanges();
     }
 }

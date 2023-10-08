@@ -7,9 +7,17 @@ namespace Pw_Manager.Services;
 
 public class ManagerService: IManagerService
 {
-    public List<PasswordsModel> GetAllPasswordsByUserId(int id)
+    private readonly IManagerRepository _repo;
+    //private readonly IUserRepository _userRepository;
+
+    public ManagerService(IManagerRepository repo)
     {
-        throw new NotImplementedException();
+        _repo = repo;
+    }
+    public List<PasswordsModel> GetAllPasswordsByUserId(int userId)
+    {
+        if (userId < 0) throw new InvalidDataException("userId cannot be less than 0");
+        return _repo.GetAllPasswordsByUserId(userId);
     }
 
     public PasswordsModel Create(PasswordsModel newPassword)
