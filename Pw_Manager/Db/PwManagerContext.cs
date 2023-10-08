@@ -10,5 +10,5 @@ public class PwManagerContext: DbContext
     }
 
     public DbSet<PasswordsModel> Passwords { get; set; }
-    public DbSet<User> users { get; set; }
+    public DbSet<UserModel> users { get; set; }
 }

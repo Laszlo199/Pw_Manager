@@ -17,7 +17,7 @@ public class ManagerSeeder
         _context.Database.EnsureCreated();
         _context.SaveChanges();
 
-        var user1 = new User()
+        var user1 = new UserModel()
         {
             Email = "user1"
         };
@@ -31,7 +31,7 @@ public class ManagerSeeder
             Email = "user1",
             Password = "asd123",
             DateCreated = DateTime.Today,
-            User = user1,
+            UserModel = user1,
         });
         _context.SaveChanges();
     }

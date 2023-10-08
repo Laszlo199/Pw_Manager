@@ -1,4 +1,5 @@
 ﻿using Pw_Manager.Db;
+using Pw_Manager.Model;
 using Pw_Security.Db;
 using Pw_Security.Db.Entity;
 using Pw_Security.IRepository;
@@ -12,9 +13,10 @@ public class UserRepository: IUserRepository
     private readonly PwManagerContext _pwManagerContext;
     
 
-    public UserRepository(SecurityContext context)
+    public UserRepository(SecurityContext context, PwManagerContext pwManagerContext)
     {
         _context = context;
+        _pwManagerContext = pwManagerContext;
     }
     public List<User> GetAll()
     {
@@ -37,11 +39,11 @@ public class UserRepository: IUserRepository
         });
         _context.SaveChanges();
 
-        _pwManagerContext.users.Add(new Pw_Manager.Model.User()
+        _pwManagerContext.users.Add(new UserModel()
         {
             Email = user.Email
         });
-        _context.SaveChanges();
+        _pwManagerContext.SaveChanges();
         return createdUser != null;
     }
 }
