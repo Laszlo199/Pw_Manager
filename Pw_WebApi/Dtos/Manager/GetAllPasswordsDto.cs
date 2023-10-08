@@ -1,8 +1,6 @@
-﻿using Pw_Security.Db.Entity;
+﻿namespace Pw_WebApi.Dtos;
 
-namespace Pw_Manager.Models;
-
-public class PasswordModel
+public class GetAllPasswordsDto
 {
     public int Id { get; set; }
     public int UserId { get; set; }

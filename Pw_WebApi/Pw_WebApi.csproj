@@ -13,6 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Pw_Manager\Pw_Manager.csproj" />
       <ProjectReference Include="..\Pw_Security\Pw_Security.csproj" />
     </ItemGroup>
 

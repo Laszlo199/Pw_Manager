@@ -33,6 +33,7 @@ public class UserRepository: IUserRepository
             PasswordHash = user.PasswordHash,
             PasswordSalt = user.PasswordSalt
         });
+        
         _context.SaveChanges();
         
         return createdUser != null;
