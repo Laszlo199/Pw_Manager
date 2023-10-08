@@ -21,7 +21,14 @@ public class AuthController : ControllerBase
     [HttpPost(nameof(Login))]
     public ActionResult<TokenDto> Login([FromBody] LoginDto loginDto)
     {
-        throw new NotImplementedException();
+        int userId; 
+        var token = _securityService.GenerateJwtToken(loginDto.Email, loginDto.Password, out userId);
+        return new TokenDto
+        {
+            Jwt = token.Jwt,
+            Message = token.Message,
+            UserId = userId,
+        };
     }
     
     // POST: api/Login   
@@ -29,7 +36,21 @@ public class AuthController : ControllerBase
     [HttpPost(nameof(Register))]
     public ActionResult<TokenDto> Register([FromBody] LoginDto loginDto)
     {
-        throw new NotImplementedException();
+        var exists = _securityService.EmailExists(loginDto.Email);
+        if(exists)
+            return BadRequest("Email already exists!");
+        if (_securityService.Create(loginDto.Email, loginDto.Password))
+        {
+            int userId;
+            var token = _securityService.GenerateJwtToken(loginDto.Email, loginDto.Password, out userId);
+            return new TokenDto
+            {
+                Jwt = token.Jwt,
+                Message = token.Message,
+                UserId = userId,
+            };
+        }
+        return BadRequest("Something went wrong.");
     }
 
 }
