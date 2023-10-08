@@ -8,5 +8,5 @@ public class PasswordsModel
     public string Email { get; set; }
     public string Password { get; set; } 
     public DateTime DateCreated { get; set; }
-    public User user { get; set; }
+    public User User { get; set; }
 }

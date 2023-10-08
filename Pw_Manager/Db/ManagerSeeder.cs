@@ -16,6 +16,13 @@ public class ManagerSeeder
         _context.Database.EnsureDeleted();
         _context.Database.EnsureCreated();
         _context.SaveChanges();
+
+        var user1 = new User()
+        {
+            Email = "user1"
+        };
+
+        _context.Add(user1);
         
         _context.Passwords.Add(new PasswordsModel()
         {
@@ -24,6 +31,7 @@ public class ManagerSeeder
             Email = "user1",
             Password = "asd123",
             DateCreated = DateTime.Today,
+            User = user1,
         });
         _context.SaveChanges();
     }

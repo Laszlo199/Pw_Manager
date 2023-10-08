@@ -5,7 +5,7 @@ namespace Pw_Manager.Db;
 
 public class PwManagerContext: DbContext
 {
-    public PwManagerContext(DbContextOptions contextOptions) : base(contextOptions)
+    public PwManagerContext(DbContextOptions<PwManagerContext> contextOptions) : base(contextOptions)
     {
     }
 

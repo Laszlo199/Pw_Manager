@@ -14,7 +14,7 @@ public class ManagerRepository: IManagerRepository
     }
     public List<PasswordsModel> GetAllPasswordsByUserId(int userId)
     {
-        return _context.Passwords.Where(p => p.user.Id == userId).ToList();
+        return _context.Passwords.Where(p => p.User.Id == userId).ToList();
     }
 
     public PasswordsModel Create(PasswordsModel newPassword)
