@@ -1,4 +1,5 @@
-﻿using Pw_Security.Db;
+﻿using Pw_Manager.Db;
+using Pw_Security.Db;
 using Pw_Security.Db.Entity;
 using Pw_Security.IRepository;
 using Pw_Security.Models;
@@ -8,6 +9,7 @@ namespace Pw_Security.Repositories;
 public class UserRepository: IUserRepository
 {
     private readonly SecurityContext _context;
+    private readonly PwManagerContext PwManagerContext;
     
 
     public UserRepository(SecurityContext context)
