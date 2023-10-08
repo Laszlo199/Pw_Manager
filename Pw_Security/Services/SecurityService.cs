@@ -37,10 +37,10 @@ public class SecurityService: ISecurityService
 
             
         //Did we not find a user with the given username?
-        if (_authenticationHelper.VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt)
-           )
+        if (_authenticationHelper.VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Secret"]));
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+                Configuration["Jwt:Secret"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             var token = new JwtSecurityToken(Configuration["Jwt:Issuer"],
                 Configuration["Jwt:Audience"],
@@ -56,7 +56,7 @@ public class SecurityService: ISecurityService
                 Message = "ok"
             };
         }
-        //dont need else
+        
         return new JwtToken()
         {
             Message = "Email or password not correct"
@@ -75,9 +75,9 @@ public class SecurityService: ISecurityService
         });
     }
 
-    public bool EmailExists(string loginDtoEmail)
+    public bool EmailExists(string email)
     {
-        var user = _repo.GetAll().FirstOrDefault(user => user.Email.Equals(loginDtoEmail));
+        var user = _repo.GetAll().FirstOrDefault(user => user.Email.Equals(email));
         return user != null;
     }
 }

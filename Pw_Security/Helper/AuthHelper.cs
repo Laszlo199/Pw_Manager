@@ -19,10 +19,10 @@ public class AuthHelper: IAuthHelper
         using (var argon2 = new Argon2id(Encoding.UTF8.GetBytes(password)))
         {
             argon2.Salt = passwordSalt;
-            argon2.Iterations = 4;
+            
             // hashing
             argon2.DegreeOfParallelism = 8; // cores
-            
+            argon2.Iterations = 4;
             argon2.MemorySize = 65536; //Have to be bigger than 4kB lol
             passwordHash = argon2.GetBytes(64); 
         }
@@ -32,40 +32,22 @@ public class AuthHelper: IAuthHelper
     {
         try
         {
-            // Argon2id verifier
-            using (var verifier = new Argon2id(Encoding.UTF8.GetBytes(password)))
+            // Create an Argon2id verifier
+            using (var argon2 = new Argon2id(Encoding.UTF8.GetBytes(password)))
             {
-                verifier.Salt = storedSalt;
-
-                // Perform the verification
-                byte[] computedHashBytes = verifier.GetBytes(64); // 64 bytes is the size of the stored hash
-
-                // Use constant-time comparison to compare hashes
-                return ConstantTimeAreEqual(computedHashBytes, storedHash);
+                argon2.Salt = storedSalt;
+                argon2.DegreeOfParallelism = 8;
+                argon2.Iterations = 4;
+                argon2.MemorySize = 65536;
+                
+                byte[] inputPasswordHash = argon2.GetBytes(64);
+                
+                return storedHash.SequenceEqual(inputPasswordHash);
             }
         }
         catch (Exception)
         {
-            // Handle exceptions, such as invalid Argon2 parameters or salt
             return false;
         }
-    }
-
-// Constant-time comparison function
-    private bool ConstantTimeAreEqual(byte[] a, byte[] b)
-    {
-        if (a == null || b == null || a.Length != b.Length)
-        {
-            return false;
-        }
-
-        bool areEqual = true;
-
-        for (int i = 0; i < a.Length; i++)
-        {
-            areEqual &= (a[i] == b[i]);
-        }
-
-        return areEqual;
     }
 }
