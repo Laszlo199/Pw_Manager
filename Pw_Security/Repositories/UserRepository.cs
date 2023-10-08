@@ -36,7 +36,12 @@ public class UserRepository: IUserRepository
             PasswordSalt = user.PasswordSalt
         });
         _context.SaveChanges();
-        
+
+        _pwManagerContext.users.Add(new Pw_Manager.Model.User()
+        {
+            Email = user.Email
+        });
+        _context.SaveChanges();
         return createdUser != null;
     }
 }
