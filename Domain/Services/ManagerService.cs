@@ -14,7 +14,7 @@ public class ManagerService: IManagerService
         _repo = repo;
         _userRepository = userRepository;
     }
-    public List<Passwords> GetAllPasswordsByUserId(int userId)
+    public IQueryable<Passwords> GetAllPasswordsByUserId(int userId)
     {
         if (userId < 0) throw new InvalidDataException("userId cannot be less than 0");
         return _repo.GetAllPasswordsByUserId(userId);

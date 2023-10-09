@@ -15,10 +15,18 @@ public class ManagerRepository: IManagerRepository
     {
         _ctx = context;
     }
-    public List<Passwords> GetAllPasswordsByUserId(int userId)
+    public IQueryable<Passwords> GetAllPasswordsByUserId(int userId)
     {
-        //return _ctx.Passwords.Where(p => p.UserEntity.Id == userId).ToList();
-        throw new NotImplementedException();
+        var passwords = _ctx.Passwords
+            .Where(c => c.UserEntity.Id == userId)
+            .Select(ca => new Passwords()
+            {
+                Id = ca.Id,
+                Email = ca.Email,
+                WebsiteName = ca.WebsiteName,
+                Password = ca.Password,
+            });
+        return passwords;
     }
 
     public Passwords Create(Passwords newPassword)
