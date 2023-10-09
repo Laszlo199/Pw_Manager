@@ -1,4 +1,4 @@
-﻿namespace Pw_WebApi.Dtos;
+﻿namespace Pw_WebApi.Dtos.AuthDto;
 
 public class TokenDto
 {

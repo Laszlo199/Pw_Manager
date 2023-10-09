@@ -30,6 +30,7 @@ public class ManagerRepository: IManagerRepository
             Email = newPassword.Email,
             WebsiteName = newPassword.WebsiteName,
             Password = newPassword.Password,
+            DateCreated = DateTime.Today,
             UserEntity = new UserEntity()
             {
                 Id = newPassword.User.Id,
@@ -64,7 +65,7 @@ public class ManagerRepository: IManagerRepository
      
      const string allChars = lowercaseChars + uppercaseChars + numericChars + specialChars;
      
-        if (length < 7 || length > 15)
+        if (length < 7 || length > 20)
         {
             throw new ArgumentOutOfRangeException("length", "Password length must be between 7 and 15 characters.");
         }

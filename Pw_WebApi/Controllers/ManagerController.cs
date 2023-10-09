@@ -1,6 +1,8 @@
 ﻿using Core.IServices;
+using Core.Models;
 using Microsoft.AspNetCore.Mvc;
 using Pw_WebApi.Dtos;
+using Pw_WebApi.Dtos.ManagerDto;
 
 namespace Pw_WebApi.Controllers;
 
@@ -24,7 +26,6 @@ public class ManagerController: ControllerBase
                     WebsiteName = p.WebsiteName,
                     Email = p.Email,
                     Password = p.Password,
-                    DateCreated = p.DateCreated
                 }));
         }
         catch (Exception e)
@@ -44,5 +45,28 @@ public class ManagerController: ControllerBase
         {
             return BadRequest(e.Message);
         }
+    }
+    
+    [HttpPost("CreateNewPassword")]
+    public ActionResult<Passwords> CreateNewPassword([FromBody] CreateNewPasswordDto postNewPasswordDto)
+    {
+        if (postNewPasswordDto == null)
+            throw new InvalidDataException("deck cannot be null");
+          
+        try
+        {
+            return Ok(_service.Create(new Passwords()
+            {
+                Email = postNewPasswordDto.Email,
+                WebsiteName = postNewPasswordDto.WebsiteName,
+                Password = postNewPasswordDto.Password,
+                User = new User{Id = postNewPasswordDto.UserId}
+            }));
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+        
     }
 }
