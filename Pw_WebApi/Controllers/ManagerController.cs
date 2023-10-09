@@ -67,6 +67,18 @@ public class ManagerController: ControllerBase
         {
             return BadRequest(e.Message);
         }
-        
+    }
+    
+    [HttpDelete("DeletePassword/{passwordId}")]
+    public ActionResult<Passwords> Delete(int passwordId)
+    {
+        try
+        {
+            return Ok(_service.Delete(passwordId));
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
     }
 }

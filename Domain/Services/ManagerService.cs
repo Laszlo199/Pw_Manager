@@ -39,7 +39,8 @@ public class ManagerService: IManagerService
 
     public Passwords Delete(int passwordId)
     {
-        throw new NotImplementedException();
+        if (passwordId < 0) throw new InvalidDataException("Password Id cannot be less than 0");
+        return _repo.Delete(passwordId);
     }
 
     public Passwords Update(Passwords password)
@@ -49,6 +50,7 @@ public class ManagerService: IManagerService
 
     public string RandomPasswordGenerator(int length)
     {
+        if (length < 0 && length > 20) throw new InvalidDataException("Length has to be less than 20 and more than 7");
         return _repo.RandomPasswordGenerator(length);
     }
 }

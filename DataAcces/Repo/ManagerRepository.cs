@@ -48,7 +48,25 @@ public class ManagerRepository: IManagerRepository
 
     public Passwords Delete(int passwordId)
     {
-        throw new NotImplementedException();
+        var passwordDelete = _ctx.Passwords
+            .Include(de=>de.UserEntity)
+            .FirstOrDefault(d => d.Id == passwordId);
+        _ctx.Passwords.Remove(passwordDelete);
+        _ctx.SaveChanges();
+        
+        return new Passwords()
+        {
+            Id = passwordDelete.Id,
+            Email = passwordDelete.Email,
+            WebsiteName = passwordDelete.WebsiteName,
+            Password = passwordDelete.Password,
+            DateCreated = passwordDelete.DateCreated,
+            User = new User
+            {
+                Id = passwordDelete.UserEntity.Id,
+                Email = passwordDelete.UserEntity.Email
+            }
+        };
     }
 
     public Passwords Update(Passwords password)
@@ -69,11 +87,10 @@ public class ManagerRepository: IManagerRepository
         {
             throw new ArgumentOutOfRangeException("length", "Password length must be between 7 and 15 characters.");
         }
-
-        // Create an array to hold the allowed character sets
+        
         string charSet = allChars;
 
-        // Generate a random password using RNGCryptoServiceProvider
+        // Generate a random password with RNGCryptoServiceProvider
         char[] password = new char[length];
         using (RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider())
         {
