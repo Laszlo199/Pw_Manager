@@ -2,7 +2,6 @@
 using DataAcces;
 using DataAcces.Entity;
 using Domain.IRepository;
-using Pw_Manager.Model;
 using Pw_Security.Db;
 using Pw_Security.Models;
 

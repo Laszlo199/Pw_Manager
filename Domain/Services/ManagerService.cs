@@ -36,6 +36,6 @@ public class ManagerService: IManagerService
 
     public string RandomPasswordGenerator(int length)
     {
-        throw new NotImplementedException();
+        return _repo.RandomPasswordGenerator(length);
     }
 }

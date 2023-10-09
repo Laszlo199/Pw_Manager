@@ -13,7 +13,7 @@ public class ManagerController: ControllerBase
     {
         _service = service;
     }
-    [HttpGet("GetAllPasswordsByUserId/{userId}")]
+    [HttpGet("GetAllByUserId/{userId}")]
     public ActionResult<List<GetAllByUserIdDto>> GetAllByUserId(int userId)
     {
         try
@@ -26,6 +26,19 @@ public class ManagerController: ControllerBase
                     Password = p.Password,
                     DateCreated = p.DateCreated
                 }));
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    [HttpGet("GenerateRandomPassword/{lenght}")]
+    public ActionResult GenerateRandomPassword(int lenght)
+    {
+        try
+        {
+            return Ok(_service.RandomPasswordGenerator(lenght));
         }
         catch (Exception e)
         {
