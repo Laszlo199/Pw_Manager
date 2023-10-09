@@ -71,7 +71,16 @@ public class ManagerRepository: IManagerRepository
 
     public Passwords Update(Passwords password)
     {
-        throw new NotImplementedException();
+        _ctx.Attach(new PasswordEntity()
+        {
+            Id = password.Id,
+            WebsiteName = password.WebsiteName,
+            Email = password.Email,
+            Password = password.Password
+        }).State = EntityState.Modified;
+        _ctx.SaveChanges();
+
+        return password;
     }
     
     public string RandomPasswordGenerator(int length)

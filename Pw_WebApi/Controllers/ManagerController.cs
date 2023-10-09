@@ -81,4 +81,24 @@ public class ManagerController: ControllerBase
             return BadRequest(e.Message);
         }
     }
+    
+    [HttpPut("UpdatePassword")]
+    public ActionResult<Passwords> Update([FromBody] UpdatePasswordDto passwordDto)
+    {
+        if (passwordDto == null) throw new InvalidDataException("Password to update cannot be null");
+        try
+        {
+            return Ok(_service.Update(new Passwords()
+            {
+                Id = passwordDto.Id,
+                Email = passwordDto.Email,
+                WebsiteName = passwordDto.WebsiteName,
+                Password = passwordDto.Password
+            }));
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
 }

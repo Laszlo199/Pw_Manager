@@ -45,7 +45,11 @@ public class ManagerService: IManagerService
 
     public Passwords Update(Passwords password)
     {
-        throw new NotImplementedException();
+        if (password.Id < 0) throw new InvalidDataException("Password ID cannot be less than 0");
+        if (password.Email.Length==0) throw new InvalidDataException("Email cannot be empty");
+        if (password.WebsiteName.Length==0) throw new InvalidDataException("Name cannot be empty");
+        if (password.Password.Length < 7 && password.Password.Length > 20) throw new InvalidDataException("Password must be bigger 7 character and smaller 20 character");
+        return _repo.Update(password);
     }
 
     public string RandomPasswordGenerator(int length)
