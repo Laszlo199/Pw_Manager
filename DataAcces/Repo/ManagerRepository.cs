@@ -34,7 +34,6 @@ public class ManagerRepository: IManagerRepository
         var model = new PasswordEntity()
         {
             Id = newPassword.Id,
-            UserId = newPassword.User.Id,
             Email = newPassword.Email,
             WebsiteName = newPassword.WebsiteName,
             Password = newPassword.Password,
@@ -125,5 +124,10 @@ public class ManagerRepository: IManagerRepository
         password = password.OrderBy(c => random.Next()).ToArray();
 
         return new string(password);
+    }
+
+    public Passwords GetPasswordsById(string password)
+    {
+        throw new NotImplementedException();
     }
 }

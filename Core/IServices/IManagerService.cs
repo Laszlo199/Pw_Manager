@@ -9,5 +9,7 @@ public interface IManagerService
     Passwords Delete(int passwordId);
     Passwords Update(Passwords password);
     string RandomPasswordGenerator(int length);
+    Passwords GetPasswordsById(string password);
     
+
 }

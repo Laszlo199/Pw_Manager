@@ -57,4 +57,9 @@ public class ManagerService: IManagerService
         if (length < 0 && length > 20) throw new InvalidDataException("Length has to be less than 20 and more than 7");
         return _repo.RandomPasswordGenerator(length);
     }
+
+    public Passwords GetPasswordsById(string password)
+    {
+        throw new NotImplementedException();
+    }
 }

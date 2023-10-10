@@ -9,4 +9,5 @@ public interface IManagerRepository
     Passwords Delete(int passwordId);
     Passwords Update(Passwords password);
     string RandomPasswordGenerator(int length);
+    Passwords GetPasswordsById(string password);
 }
