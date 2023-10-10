@@ -10,10 +10,10 @@ public class ManagerRepository: IManagerRepository
 {
     private readonly PwManagerContext _ctx;
     
-
     public ManagerRepository(PwManagerContext context)
     {
         _ctx = context;
+       
     }
     public IQueryable<Passwords> GetAllPasswordsByUserId(int userId)
     {
@@ -31,12 +31,13 @@ public class ManagerRepository: IManagerRepository
 
     public Passwords Create(Passwords newPassword)
     {
+        var transformer = new Transformer.Transformer();
         var model = new PasswordEntity()
         {
             Id = newPassword.Id,
             Email = newPassword.Email,
             WebsiteName = newPassword.WebsiteName,
-            Password = newPassword.Password,
+            Password = transformer.EncryptPassword(newPassword.Password),
             DateCreated = DateTime.Today,
             UserEntity = new UserEntity()
             {
