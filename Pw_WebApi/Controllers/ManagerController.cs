@@ -15,6 +15,7 @@ public class ManagerController: ControllerBase
     {
         _service = service;
     }
+    
     [HttpGet("GetAllByUserId/{userId}")]
     public ActionResult<List<GetAllByUserIdDto>> GetAllByUserId(int userId)
     {

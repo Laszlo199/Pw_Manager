@@ -1,9 +1,13 @@
+using System.Text;
 using Core.IServices;
 using DataAcces;
 using DataAcces.Repo;
 using Domain.IRepository;
 using Domain.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Pw_Security.Db;
 using Pw_Security.Helper;
 using Pw_Security.IServices;
@@ -17,8 +21,90 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "JWT Authorization header using the Bearer scheme."
+    });
 
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] { }
+        }
+    });
+    
+
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Pw_WebApi",
+        Version = "v1"
+    });
+    
+});
+
+// CORS config
+
+builder.Services.AddCors(option =>
+{
+    option.AddPolicy("Pig",
+        builder =>
+        {
+            builder
+                .WithOrigins("http://localhost:5284")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
+
+builder.Services.AddAuthentication(authentificationOptions =>
+    {
+        authentificationOptions.DefaultAuthenticateScheme =
+            JwtBearerDefaults.AuthenticationScheme;
+
+        authentificationOptions.DefaultChallengeScheme =
+            JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey =
+                new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(builder.Configuration["Jwt:secret"])),
+            ValidateIssuer = true,
+            ValidIssuer = builder.Configuration["Jwt:issuer"],
+            ValidateAudience = true,
+            ValidAudience = builder.Configuration["Jwt:audience"],
+            ValidateLifetime = true
+        };
+    });
+
+
+//Manager
+builder.Services.AddScoped<IManagerService, ManagerService>();
+builder.Services.AddScoped<IManagerRepository, ManagerRepository>();
+builder.Services.AddScoped<ManagerSeeder>();
+
+builder.Services.AddDbContext<PwManagerContext>(options => { options.UseSqlite("Data Source = manager.db"); });
+builder.Services.AddTransient<ManagerSeeder>();
+
+//Security
 builder.Services.AddScoped<ISecurityService, SecurityService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthHelper, AuthHelper>();
@@ -33,6 +119,7 @@ builder.Services.AddTransient<SecuritySeeder>();
 var app = builder.Build();
 
 AuthSeeder(app);
+ManagerSeeder(app);
 
 void AuthSeeder(IHost app)
 {
@@ -41,6 +128,17 @@ void AuthSeeder(IHost app)
     using (var scope = scopedFactory.CreateScope())
     {
         var service = scope.ServiceProvider.GetService<SecuritySeeder>();
+        service.SeedDevelopment();
+    }
+}
+
+void ManagerSeeder(IHost app)
+{
+    var scopedFactory = app.Services.GetService<IServiceScopeFactory>();
+
+    using (var scope = scopedFactory.CreateScope())
+    {
+        var service = scope.ServiceProvider.GetService<ManagerSeeder>();
         service.SeedDevelopment();
     }
 }
