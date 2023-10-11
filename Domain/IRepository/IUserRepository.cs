@@ -1,6 +1,6 @@
-﻿using Pw_Security.Db.Entity;
+﻿using Core.Models;
 
-namespace Pw_Security.IRepository;
+namespace Domain.IRepository;
 
 public interface IUserRepository
 {

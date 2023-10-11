@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Pw_Security.IServices;
-using Pw_WebApi.Dtos;
+
+using Pw_WebApi.Dtos.AuthDto;
 
 namespace Pw_WebApi.Controllers;
 
@@ -15,8 +16,7 @@ public class AuthController : ControllerBase
     {
         _securityService = securityService;
     }
-        
-    // POST: api/Login
+    
     //[AllowAnonymous] 
     [HttpPost(nameof(Login))]
     public ActionResult<TokenDto> Login([FromBody] LoginDto loginDto)
@@ -31,7 +31,6 @@ public class AuthController : ControllerBase
         };
     }
     
-    // POST: api/Login   
     //[AllowAnonymous]
     [HttpPost(nameof(Register))]
     public ActionResult<TokenDto> Register([FromBody] LoginDto loginDto)

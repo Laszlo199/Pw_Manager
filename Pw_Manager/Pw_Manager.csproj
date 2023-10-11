@@ -6,4 +6,21 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.11" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Pw_Manager">
+        <HintPath>..\Pw_WebApi\bin\Debug\net7.0\Pw_Manager.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="IRepository\" />
+      <Folder Include="Model\" />
+      <Folder Include="Services\" />
+    </ItemGroup>
+
 </Project>
