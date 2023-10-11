@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="a5bf5fbb-f9e9-4d32-955c-e25ca7f8058d" name="Changes" comment="" />
+    <list default="true" id="a5bf5fbb-f9e9-4d32-955c-e25ca7f8058d" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/Pw_WebApi/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Pw_WebApi/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Pw_WebApi/auth.db" beforeDir="false" afterPath="$PROJECT_DIR$/Pw_WebApi/auth.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Pw_WebApi/manager.db" beforeDir="false" afterPath="$PROJECT_DIR$/Pw_WebApi/manager.db" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -33,6 +37,7 @@
       <updated>1696842722023</updated>
       <workItem from="1696842722028" duration="21000" />
       <workItem from="1696842763142" duration="17000" />
+      <workItem from="1697034695504" duration="12000" />
     </task>
     <servers />
   </component>

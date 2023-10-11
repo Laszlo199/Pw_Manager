@@ -23,10 +23,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
+    //c.OperationFilter<SecurityAuth>();
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
-        Type = SecuritySchemeType.Http,
+        Type = SecuritySchemeType.ApiKey,
         Scheme = "Bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
@@ -61,7 +62,7 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddCors(option =>
 {
-    option.AddPolicy("Pig",
+    option.AddPolicy("Pw_WebApi",
         builder =>
         {
             builder
@@ -153,6 +154,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+app.UseAuthentication();
 
 app.MapControllers();
 
