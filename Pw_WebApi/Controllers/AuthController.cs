@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Pw_Security.IServices;
-using Pw_WebApi.Dtos;
+
 using Pw_WebApi.Dtos.AuthDto;
 
 namespace Pw_WebApi.Controllers;

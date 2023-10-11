@@ -20,13 +20,13 @@ public class ManagerSeeder
         
         var password = "password123";
         var password2 = "asd123";
+        var email = "user1@gmail.com";
+        var websiteName = "Gmail";
+        var websiteName2 = "Facebook";
         var transformer = new Transformer.Transformer();
-        transformer.EncryptPassword(password);
-        transformer.EncryptPassword(password2);
-
         var user1 = new UserEntity()
         {
-            Email = "user1",
+            Email = transformer.EncryptPassword(email),
             PasswordHash = new byte[64],
             PasswordSalt = new byte[64]
         };
@@ -34,8 +34,8 @@ public class ManagerSeeder
         _context.Add(user1);
         _context.Passwords.Add(new PasswordEntity()
         {
-            WebsiteName = "Gmail",
-            Email = "user1",
+            WebsiteName = transformer.EncryptPassword(websiteName),
+            Email = transformer.EncryptPassword(email),
             Password = transformer.EncryptPassword(password),
             DateCreated = DateTime.Today,
             UserEntity = user1,
@@ -43,8 +43,8 @@ public class ManagerSeeder
         
         _context.Passwords.Add(new PasswordEntity()
         {
-            WebsiteName = "Facebook",
-            Email = "user1",
+            WebsiteName = transformer.EncryptPassword(websiteName2),
+            Email = transformer.EncryptPassword(email),
             Password = transformer.EncryptPassword(password2),
             DateCreated = DateTime.Today,
             UserEntity = user1,
