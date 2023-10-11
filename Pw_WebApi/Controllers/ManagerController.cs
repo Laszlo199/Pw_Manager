@@ -101,4 +101,22 @@ public class ManagerController: ControllerBase
             return BadRequest(e.Message);
         }
     }
+    [HttpGet("GetPasswordById/{passwordId}")]
+    public ActionResult<GetAllByUserIdDto> GetPasswordById(int passwordId)
+    {
+        try
+        {
+            return Ok(_service.GetPasswordsById( passwordId)
+                .Select(p => new GetAllByUserIdDto()
+                {
+                    WebsiteName = p.WebsiteName,
+                    Email = p.Email,
+                    Password = p.Password,
+                }));
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
 }

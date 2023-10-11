@@ -79,12 +79,13 @@ public class ManagerRepository: IManagerRepository
 
     public Passwords Update(Passwords password)
     {
+        var transformer = new Transformer.Transformer();
         _ctx.Attach(new PasswordEntity()
         {
             Id = password.Id,
             WebsiteName = password.WebsiteName,
             Email = password.Email,
-            Password = password.Password
+            Password = transformer.EncryptPassword(password.Password)
         }).State = EntityState.Modified;
         _ctx.SaveChanges();
 
@@ -102,7 +103,7 @@ public class ManagerRepository: IManagerRepository
      
         if (length < 7 || length > 20)
         {
-            throw new ArgumentOutOfRangeException("length", "Password length must be between 7 and 15 characters.");
+            throw new ArgumentOutOfRangeException("length", "Password length must be between 7 and 20 characters.");
         }
         
         string charSet = allChars;
@@ -127,8 +128,15 @@ public class ManagerRepository: IManagerRepository
         return new string(password);
     }
 
-    public Passwords GetPasswordsById(string password)
+    public IQueryable<Passwords> GetPasswordsById( int id)
     {
-        throw new NotImplementedException();
+        var transformer = new Transformer.Transformer();
+        return _ctx.Passwords.Where(c =>c.Id == id).Select(ca => new Passwords()
+        {
+            Id = ca.Id,
+            Email = ca.Email,
+            WebsiteName = ca.WebsiteName,
+            Password = transformer.DecryptPassword(ca.Password),
+        });
     }
 }

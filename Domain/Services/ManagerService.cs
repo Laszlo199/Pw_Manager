@@ -58,8 +58,8 @@ public class ManagerService: IManagerService
         return _repo.RandomPasswordGenerator(length);
     }
 
-    public Passwords GetPasswordsById(string password)
+    public IQueryable<Passwords> GetPasswordsById(int passwordId)
     {
-        throw new NotImplementedException();
+        return _repo.GetPasswordsById(passwordId);
     }
 }

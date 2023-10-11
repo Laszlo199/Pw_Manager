@@ -5,15 +5,14 @@ namespace DataAcces.Transformer;
 
 public class Transformer: ITransformer
 {
-    private const int KeySize = 256; // AES-256
-
     public string EncryptPassword(string password)
     {
-        byte[] encryptionKey = Generate256BitAesKey();
-
+        string key = "asd";
         using (Aes aesAlg = Aes.Create())
         {
-            aesAlg.Key = encryptionKey;
+            var properSizeString = Generate128BitString(key);
+            aesAlg.Key = Encoding.UTF8.GetBytes(properSizeString);
+            
             aesAlg.GenerateIV();
 
             ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
@@ -22,42 +21,34 @@ public class Transformer: ITransformer
             {
                 using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
                 {
-                    using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
-                    {
-                        swEncrypt.Write(password);
-                    }
+                    byte[] plainTextBytes = Encoding.UTF8.GetBytes(password);
+                    csEncrypt.Write(plainTextBytes, 0, plainTextBytes.Length);
+                    csEncrypt.FlushFinalBlock();
+
+                    byte[] ivAndEncryptedBytes = new byte[aesAlg.IV.Length + msEncrypt.Length];
+                    Array.Copy(aesAlg.IV, ivAndEncryptedBytes, aesAlg.IV.Length);
+                    Array.Copy(msEncrypt.ToArray(), 0, ivAndEncryptedBytes, aesAlg.IV.Length, msEncrypt.Length);
+
+                    return Convert.ToBase64String(ivAndEncryptedBytes);
                 }
-
-                byte[] iv = aesAlg.IV;
-                byte[] encryptedBytes = msEncrypt.ToArray();
-                byte[] result = new byte[iv.Length + encryptedBytes.Length];
-                Buffer.BlockCopy(iv, 0, result, 0, iv.Length);
-                Buffer.BlockCopy(encryptedBytes, 0, result, iv.Length, encryptedBytes.Length);
-
-                return Convert.ToBase64String(result);
             }
         }
     }
 
     public string DecryptPassword(string encryptedPassword)
     {
-        byte[] encryptionKey = Generate256BitAesKey();
+        string key = "asd";
+        byte[] ivAndEncryptedBytes = Convert.FromBase64String(encryptedPassword);
+
         using (Aes aesAlg = Aes.Create())
         {
-            aesAlg.Key = encryptionKey;
-
-            byte[] encryptedBytes = Convert.FromBase64String(encryptedPassword);
-            byte[] iv = new byte[aesAlg.BlockSize / 8];
-            byte[] cipherText = new byte[encryptedBytes.Length - iv.Length];
-
-            Buffer.BlockCopy(encryptedBytes, 0, iv, 0, iv.Length);
-            Buffer.BlockCopy(encryptedBytes, iv.Length, cipherText, 0, cipherText.Length);
-
-            aesAlg.IV = iv;
+            var properSizeString = Generate128BitString(key);
+            aesAlg.Key = Encoding.UTF8.GetBytes(properSizeString);
+            aesAlg.IV = ivAndEncryptedBytes.Take(aesAlg.IV.Length).ToArray();
 
             ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
 
-            using (MemoryStream msDecrypt = new MemoryStream(cipherText))
+            using (MemoryStream msDecrypt = new MemoryStream(ivAndEncryptedBytes, aesAlg.IV.Length, ivAndEncryptedBytes.Length - aesAlg.IV.Length))
             {
                 using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
                 {
@@ -69,14 +60,15 @@ public class Transformer: ITransformer
             }
         }
     }
-    
-    public static byte[] Generate256BitAesKey()
+
+    public static string Generate128BitString(string input)
     {
-        using (Aes aesAlg = Aes.Create())
+        using (SHA256 sha256 = SHA256.Create())
         {
-            aesAlg.KeySize = 256; // Set the desired key size
-            aesAlg.GenerateKey();
-            return aesAlg.Key;
+            byte[] hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(input));
+            byte[] first16Bytes = new byte[16];
+            Array.Copy(hash, 0, first16Bytes, 0, 16);
+            return BitConverter.ToString(first16Bytes).Replace("-", "");
         }
     }
 }
