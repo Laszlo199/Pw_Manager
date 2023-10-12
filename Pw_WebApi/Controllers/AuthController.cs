@@ -23,6 +23,8 @@ public class AuthController : ControllerBase
     {
         int userId; 
         var token = _securityService.GenerateJwtToken(loginDto.Email, loginDto.Password, out userId);
+        if (userId == -1)
+            return BadRequest("Invalid username or password");
         return new TokenDto
         {
             Jwt = token.Jwt,
