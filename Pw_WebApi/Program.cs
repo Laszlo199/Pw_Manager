@@ -49,7 +49,7 @@ builder.Services.AddSwaggerGen(c =>
                     Id = JwtBearerDefaults.AuthenticationScheme
                 }
             },
-            new string[] {"Bearer " }
+            new[] {""}
         }
     });
 });
@@ -86,8 +86,8 @@ builder.Services.AddAuthentication(authentificationOptions =>
                     Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"])),
             ValidateIssuer = true,
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidateAudience = true,
-            ValidAudience = builder.Configuration["Jwt:Audience"],
+            ValidateAudience = false,
+            //ValidAudience = builder.Configuration["Jwt:Audience"],
             ValidateLifetime = true
         };
     });

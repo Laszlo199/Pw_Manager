@@ -1,0 +1,8 @@
+﻿services:
+  pw_webapi:
+    image: pw_webapi
+    build:
+      context: .
+      dockerfile: Pw_WebApi/Dockerfile
+    ports:
+      - "5000:80"
