@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Pw_Frontend;
+using PW_Frontend;
 using Pw_Frontend.Application.Extension;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);

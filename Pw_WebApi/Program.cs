@@ -23,7 +23,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    //c.OperationFilter<SecurityAuth>();
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -66,7 +65,7 @@ builder.Services.AddCors(option =>
         builder =>
         {
             builder
-                .WithOrigins("http://localhost:5284")
+                .WithOrigins("http://localhost:3000")
                 .AllowAnyHeader()
                 .AllowAnyMethod();
         });
@@ -95,7 +94,6 @@ builder.Services.AddAuthentication(authentificationOptions =>
             ValidateLifetime = true
         };
     });
-
 
 //Manager
 builder.Services.AddScoped<IManagerService, ManagerService>();
@@ -150,6 +148,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("Pw_WebApi");
 
 app.UseHttpsRedirection();
 
