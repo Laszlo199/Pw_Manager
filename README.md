@@ -27,3 +27,8 @@ In this project, we implemented a password manager with a strong focus on securi
        
     If Swagger didn’t automatically open you can open Swagger by using this link: http://localhost:5284/swagger/index.html
 
+6. Group:
+
+   Laszlo Tolnay
+   Tomáš Peniak
+
