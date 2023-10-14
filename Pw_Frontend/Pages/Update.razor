@@ -1,0 +1,66 @@
+﻿@page "/Update/{id:int}"
+@using Pw_Frontend.Application.Services
+@using Pw_Frontend.Dtos.ManagerDto
+@using Pw_Frontend.Application.Dtos
+@inject IHttpService HttpService
+@inject NavigationManager NavigationManager
+
+<div class="container card shadow rounded p-3 col-md-4">
+    <h3>Update</h3>
+    <EditForm Model="UpdatePasswordDto">
+        <div class="form-floating">
+            <input type="text" class="form-control" @bind="UpdatePasswordDto.WebsiteName"/>
+            <label>Website:</label>
+        </div>
+        <div class="form-floating">
+            <input type="email" class="form-control" @bind="UpdatePasswordDto.Email"/>
+            <label>Email:</label>
+        </div>
+        <button class="btn btn-secondary w-100" @onclick="() => GenerateStrongPassword()">Generate strong password</button>
+        <div class="form-floating">
+            <input type="text" class="form-control" @bind="UpdatePasswordDto.Password"/>
+            <label>Password:</label>
+        </div>
+        <div class="btn-group w-100 mt-3">
+            <button class="btn btn-primary" type="submit" @onclick="Save">Save password</button>
+        </div>
+    </EditForm>
+</div>
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+    
+    public UpdatePasswordDto UpdatePasswordDto { get; set; } = new UpdatePasswordDto();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var getAllByUserIdDto = (await HttpService.Get<List<GetAllByUserIdDto>>($"api/Manager/GetPasswordById/{id}"))?
+            .FirstOrDefault();
+        if (getAllByUserIdDto is null)
+        {
+            return;
+        }
+        UpdatePasswordDto.Id = getAllByUserIdDto.Id;
+        UpdatePasswordDto.Password = getAllByUserIdDto.Password;
+        UpdatePasswordDto.Email = getAllByUserIdDto.Email;
+        UpdatePasswordDto.WebsiteName = getAllByUserIdDto.WebsiteName;
+        await base.OnInitializedAsync();
+    }
+    
+    private async Task Save()
+    {
+        await HttpService.Put("api/Manager/UpdatePassword", UpdatePasswordDto);
+        NavigationManager.NavigateTo("/");
+    }
+    
+    private async Task GenerateStrongPassword(int length = 16)
+    {
+        var password = await HttpService.Get<PasswordDto>($"api/Manager/GenerateRandomPassword/{length}");
+        if (password == null)
+        {
+            return;
+        }
+        UpdatePasswordDto.Password = password.Password;
+    }
+}

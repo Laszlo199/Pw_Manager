@@ -1,0 +1,60 @@
+﻿@page "/Create"
+@using Pw_Frontend.Application.Services
+@using Pw_Frontend.Dtos.ManagerDto
+@using Pw_Frontend.Application.Dtos
+@inject IAuthenticationService AuthenticationService
+@inject NavigationManager NavigationManager
+@inject IHttpService HttpService
+
+<div class="container card shadow rounded p-3 col-md-4">
+    <h3>Create new password</h3>
+    <EditForm Model="CreateNewPasswordDto">
+        <div class="form-floating">
+            <input type="text" class="form-control" @bind="CreateNewPasswordDto.WebsiteName"/>
+            <label>Website:</label>
+        </div>
+        <div class="form-floating">
+            <input type="email" class="form-control" @bind="CreateNewPasswordDto.Email"/>
+            <label>Email:</label>
+        </div>
+        <button class="btn btn-secondary w-100" @onclick="() => GenerateStrongPassword()">Generate strong password</button>
+        <div class="form-floating">
+            <input type="password" class="form-control" @bind="CreateNewPasswordDto.Password"/>
+            <label>Password:</label>
+        </div>
+        <div class="btn-group w-100 mt-3">
+            <button class="btn btn-primary" type="submit" @onclick="Save">Save password</button>
+        </div>
+    </EditForm>
+</div>
+
+@code {
+    public CreateNewPasswordDto CreateNewPasswordDto { get; set; } = new CreateNewPasswordDto();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var userId = AuthenticationService.TokenDto?.UserId;
+        if (userId == null)
+        {
+            NavigationManager.NavigateTo("/Login");
+        }
+        CreateNewPasswordDto.UserId = AuthenticationService.TokenDto!.UserId;
+        await base.OnInitializedAsync();
+    }
+
+    private async Task Save()
+    {
+        await HttpService.Post("api/Manager/CreateNewPassword", CreateNewPasswordDto);
+        NavigationManager.NavigateTo("/");
+    }
+
+    private async Task GenerateStrongPassword(int length = 16)
+    {
+        var password = await HttpService.Get<PasswordDto>($"api/Manager/GenerateRandomPassword/{length}");
+        if (password == null)
+        {
+            return;
+        }
+        CreateNewPasswordDto.Password = password.Password;
+    }
+}
