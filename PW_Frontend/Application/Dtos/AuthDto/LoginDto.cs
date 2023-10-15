@@ -1,4 +1,4 @@
-﻿namespace Pw_Frontend.Dtos.AuthDto;
+﻿namespace PW_Frontend.Application.Dtos.AuthDto;
 
 public class LoginDto
 {

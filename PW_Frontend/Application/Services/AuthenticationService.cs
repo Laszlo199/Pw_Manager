@@ -1,6 +1,8 @@
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
+using PW_Frontend.Application.Dtos.AuthDto;
 using Pw_Frontend.Dtos.AuthDto;
+using PW_Frontend.Helpers;
 
 namespace Pw_Frontend.Application.Services;
 
@@ -38,10 +40,16 @@ public class AuthenticationService : IAuthenticationService
 
     public async Task Register(LoginDto loginDto)
     {
+        byte[] masterKey = EncryptionHelper.GenerateMasterKey(loginDto.Email, loginDto.Password);
+        var masterHash = EncryptionHelper.GenerateMasterHash(loginDto.Password, masterKey);
+        loginDto.Password = System.Text.Encoding.UTF8.GetString(masterHash);
         await _httpService.Post("/api/Auth/Register", loginDto);
     }
-    public async Task Login(LoginDto loginDto)
-    {
+    public async Task Login(LoginDto loginDto) {
+        byte[] masterKey = EncryptionHelper.GenerateMasterKey(loginDto.Email, loginDto.Password);
+        await _localStorageService.SetItemAsync("masterKey", masterKey);
+        var masterHash = EncryptionHelper.GenerateMasterHash(loginDto.Password, masterKey);
+        loginDto.Password = System.Text.Encoding.UTF8.GetString(masterHash);
         TokenDto = await _httpService.Post<TokenDto>("/api/Auth/login", loginDto);
         await _localStorageService.SetItemAsync("tokenDto", TokenDto);
     }
@@ -50,6 +58,7 @@ public class AuthenticationService : IAuthenticationService
     {
         TokenDto = null;
         await _localStorageService.RemoveItemAsync("tokenDto");
+        await _localStorageService.RemoveItemAsync("masterKey");
         _navigationManager.NavigateTo("login");
     }
 }
