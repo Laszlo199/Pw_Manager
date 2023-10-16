@@ -72,58 +72,6 @@ namespace PW_Frontend.Helpers {
 
             return outputKey;
         }
-        
-        
-        // TODO: this won't work in browser (sadge) we need to find a workaround
-        public string EncryptPassword(string password, byte[] key) {
-            using Aes aesAlg = Aes.Create();
-            aesAlg.Key = key;
-                
-            aesAlg.GenerateIV();
-
-            ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
-
-            using (MemoryStream msEncrypt = new())
-            {
-                using (CryptoStream csEncrypt = new(msEncrypt, encryptor, CryptoStreamMode.Write))
-                {
-                    byte[] plainTextBytes = Encoding.UTF8.GetBytes(password);
-                    csEncrypt.Write(plainTextBytes, 0, plainTextBytes.Length);
-                    csEncrypt.FlushFinalBlock();
-
-                    byte[] ivAndEncryptedBytes = new byte[aesAlg.IV.Length + msEncrypt.Length];
-                    Array.Copy(aesAlg.IV, ivAndEncryptedBytes, aesAlg.IV.Length);
-                    Array.Copy(msEncrypt.ToArray(), 0, ivAndEncryptedBytes, aesAlg.IV.Length, msEncrypt.Length);
-
-                    return Convert.ToBase64String(ivAndEncryptedBytes);
-                }
-            }
-        }
-
-        
-        // TODO: this won't work in browser (sadge) we need to find a workaround
-        public string DecryptPassword(string encryptedPassword, byte[] key)
-        {
-            byte[] ivAndEncryptedBytes = Convert.FromBase64String(encryptedPassword);
-
-            using (Aes aesAlg = Aes.Create()) {
-                aesAlg.Key = key;
-                aesAlg.IV = ivAndEncryptedBytes.Take(aesAlg.IV.Length).ToArray();
-
-                ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
-
-                using (MemoryStream msDecrypt = new(ivAndEncryptedBytes, aesAlg.IV.Length, ivAndEncryptedBytes.Length - aesAlg.IV.Length))
-                {
-                    using (CryptoStream csDecrypt = new(msDecrypt, decryptor, CryptoStreamMode.Read))
-                    {
-                        using (StreamReader srDecrypt = new(csDecrypt))
-                        {
-                            return srDecrypt.ReadToEnd();
-                        }
-                    }
-                }
-            }
-        }
 
         private static byte[] ConcatenateBytes(params byte[][] arrays)
         {

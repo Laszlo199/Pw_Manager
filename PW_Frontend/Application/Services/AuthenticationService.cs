@@ -9,6 +9,7 @@ namespace Pw_Frontend.Application.Services;
 public interface IAuthenticationService
 {
     TokenDto? TokenDto { get; }
+    byte[]? StretchedKey { get; }
     Task Initialize();
     Task Register(LoginDto loginDto);
     Task Login(LoginDto loginDto);
@@ -21,6 +22,7 @@ public class AuthenticationService : IAuthenticationService
     private NavigationManager _navigationManager;
     private ILocalStorageService _localStorageService;
     public TokenDto? TokenDto { get; private set; }
+    public byte[]? StretchedKey { get; private set; }
 
     public AuthenticationService(
         IHttpService httpService,
@@ -36,6 +38,7 @@ public class AuthenticationService : IAuthenticationService
     public async Task Initialize()
     {
         TokenDto = await _localStorageService.GetItemAsync<TokenDto>("tokenDto");
+        StretchedKey = await _localStorageService.GetItemAsync<byte[]>("stretchedKey");
     }
 
     public async Task Register(LoginDto loginDto)
@@ -47,10 +50,11 @@ public class AuthenticationService : IAuthenticationService
     }
     public async Task Login(LoginDto loginDto) {
         byte[] masterKey = EncryptionHelper.GenerateMasterKey(loginDto.Email, loginDto.Password);
-        await _localStorageService.SetItemAsync("masterKey", masterKey);
         var masterHash = EncryptionHelper.GenerateMasterHash(loginDto.Password, masterKey);
         loginDto.Password = System.Text.Encoding.UTF8.GetString(masterHash);
         TokenDto = await _httpService.Post<TokenDto>("/api/Auth/login", loginDto);
+        byte[] stretchedKey = EncryptionHelper.GenerateStretchedMasterKey(masterKey);
+        await _localStorageService.SetItemAsync("stretchedKey", stretchedKey);
         await _localStorageService.SetItemAsync("tokenDto", TokenDto);
     }
 
@@ -58,7 +62,7 @@ public class AuthenticationService : IAuthenticationService
     {
         TokenDto = null;
         await _localStorageService.RemoveItemAsync("tokenDto");
-        await _localStorageService.RemoveItemAsync("masterKey");
+        await _localStorageService.RemoveItemAsync("stretchedKey");
         _navigationManager.NavigateTo("login");
     }
 }

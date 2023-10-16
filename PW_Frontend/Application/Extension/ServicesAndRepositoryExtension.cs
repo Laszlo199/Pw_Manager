@@ -1,6 +1,8 @@
 using Blazored.LocalStorage;
 using Blazored.Toast;
 using Pw_Frontend.Application.Services;
+using PW_Frontend.Helpers;
+using PW_Frontend.Service;
 
 namespace Pw_Frontend.Application.Extension;
 
@@ -17,6 +19,8 @@ public static class ServicesAndRepositoryExtension
 
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddTransient<IHttpService, HttpService>();
+        services.AddTransient<CryptoInteropService>();
+        services.AddTransient<EncryptionHelper>();
 
         #endregion
 

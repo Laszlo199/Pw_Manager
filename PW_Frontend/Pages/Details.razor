@@ -1,7 +1,11 @@
 ﻿@page "/Details/{id:int}"
 @using Pw_Frontend.Application.Services
 @using Pw_Frontend.Dtos.ManagerDto
+@using PW_Frontend.Service
 @inject IHttpService HttpService
+@inject NavigationManager NavigationManager
+@inject CryptoInteropService CryptoInteropService
+@inject IAuthenticationService AuthenticationService
 
 <div class="container card shadow rounded p-3 col-md-4">
     <h3>Details</h3>
@@ -21,18 +25,25 @@
 
 @code {
     [Parameter]
-    public int id { get; set; }
-    
-    public GetAllByUserIdDto GetAllByUserIdDto { get; set; } = new GetAllByUserIdDto();
+    public int Id { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    private GetAllByUserIdDto GetAllByUserIdDto { get; set; } = new();
+
+    protected async override Task OnInitializedAsync()
     {
-        var getAllByUserIdDto = (await HttpService.Get<List<GetAllByUserIdDto>>($"api/Manager/GetPasswordById/{id}"))?
+        var userId = AuthenticationService.TokenDto?.UserId;
+        byte[]? stretchedKey = AuthenticationService.StretchedKey;
+        if (userId is null || stretchedKey is null)
+        {
+            NavigationManager.NavigateTo("/Login");
+        }
+        var getAllByUserIdDto = (await HttpService.Get<List<GetAllByUserIdDto>>($"api/Manager/GetPasswordById/{Id}"))?
             .FirstOrDefault();
         if (getAllByUserIdDto is null)
         {
             return;
         }
+        getAllByUserIdDto.Password = await CryptoInteropService.DecryptData(getAllByUserIdDto.Password, stretchedKey);
         GetAllByUserIdDto = getAllByUserIdDto;
         await base.OnInitializedAsync();
     }

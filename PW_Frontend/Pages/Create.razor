@@ -2,9 +2,11 @@
 @using Pw_Frontend.Application.Services
 @using Pw_Frontend.Dtos.ManagerDto
 @using Pw_Frontend.Application.Dtos
+@using PW_Frontend.Service
 @inject IAuthenticationService AuthenticationService
 @inject NavigationManager NavigationManager
 @inject IHttpService HttpService
+@inject CryptoInteropService CryptoInteropService
 
 <div class="container card shadow rounded p-3 col-md-4">
     <h3>Create new password</h3>
@@ -29,12 +31,13 @@
 </div>
 
 @code {
-    public CreateNewPasswordDto CreateNewPasswordDto { get; set; } = new CreateNewPasswordDto();
+    public CreateNewPasswordDto CreateNewPasswordDto { get; set; } = new();
 
-    protected override async Task OnInitializedAsync()
+    protected async override Task OnInitializedAsync()
     {
         var userId = AuthenticationService.TokenDto?.UserId;
-        if (userId == null)
+        byte[]? stretchedKey = AuthenticationService.StretchedKey;
+        if (userId is null || stretchedKey is null)
         {
             NavigationManager.NavigateTo("/Login");
         }
@@ -42,8 +45,10 @@
         await base.OnInitializedAsync();
     }
 
-    private async Task Save()
-    {
+    private async Task Save() {
+        var newPassDto = CreateNewPasswordDto;
+        byte[]? stretchedKey = AuthenticationService.StretchedKey;
+        newPassDto.Password = await CryptoInteropService.DecryptData(newPassDto.Password, stretchedKey);
         await HttpService.Post("api/Manager/CreateNewPassword", CreateNewPasswordDto);
         NavigationManager.NavigateTo("/");
     }

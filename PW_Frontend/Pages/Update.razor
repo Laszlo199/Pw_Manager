@@ -2,8 +2,11 @@
 @using Pw_Frontend.Application.Services
 @using Pw_Frontend.Dtos.ManagerDto
 @using Pw_Frontend.Application.Dtos
+@using PW_Frontend.Service
 @inject IHttpService HttpService
 @inject NavigationManager NavigationManager
+@inject CryptoInteropService CryptoInteropService
+@inject IAuthenticationService AuthenticationService
 
 <div class="container card shadow rounded p-3 col-md-4">
     <h3>Update</h3>
@@ -29,34 +32,43 @@
 
 @code {
     [Parameter]
-    public int id { get; set; }
+    public int Id { get; set; }
     
     public UpdatePasswordDto UpdatePasswordDto { get; set; } = new UpdatePasswordDto();
 
-    protected override async Task OnInitializedAsync()
+    protected async override Task OnInitializedAsync()
     {
-        var getAllByUserIdDto = (await HttpService.Get<List<GetAllByUserIdDto>>($"api/Manager/GetPasswordById/{id}"))?
+        int? userId = AuthenticationService.TokenDto?.UserId;
+        byte[]? stretchedKey = AuthenticationService.StretchedKey;
+        if (userId is null || stretchedKey is null)
+        {
+            NavigationManager.NavigateTo("/Login");
+        }
+        
+        var getAllByUserIdDto = (await HttpService.Get<List<GetAllByUserIdDto>>($"api/Manager/GetPasswordById/{Id}"))?
             .FirstOrDefault();
         if (getAllByUserIdDto is null)
         {
             return;
         }
         UpdatePasswordDto.Id = getAllByUserIdDto.Id;
-        UpdatePasswordDto.Password = getAllByUserIdDto.Password;
+        UpdatePasswordDto.Password = await CryptoInteropService.DecryptData(getAllByUserIdDto.Password, stretchedKey);
         UpdatePasswordDto.Email = getAllByUserIdDto.Email;
         UpdatePasswordDto.WebsiteName = getAllByUserIdDto.WebsiteName;
         await base.OnInitializedAsync();
     }
     
-    private async Task Save()
-    {
-        await HttpService.Put("api/Manager/UpdatePassword", UpdatePasswordDto);
+    private async Task Save() {
+        byte[]? stretchedKey = AuthenticationService.StretchedKey;
+        var updatedPassDto = UpdatePasswordDto;
+        updatedPassDto.Password = await CryptoInteropService.DecryptData(updatedPassDto.Password, stretchedKey);
+        await HttpService.Put("api/Manager/UpdatePassword", updatedPassDto);
         NavigationManager.NavigateTo("/");
     }
     
     private async Task GenerateStrongPassword(int length = 16)
     {
-        var password = await HttpService.Get<PasswordDto>($"api/Manager/GenerateRandomPassword/{length}");
+        PasswordDto? password = await HttpService.Get<PasswordDto>($"api/Manager/GenerateRandomPassword/{length}");
         if (password == null)
         {
             return;
