@@ -11,7 +11,7 @@ namespace PW_Frontend.Helpers {
         /// <returns>Master key as a Byte array</returns>
         public static byte[] GenerateMasterKey(string email, string masterPass) {
 
-            const int iterations = 600000;
+            const int iterations = 6000; // 600k is waay too slow
             const int keyLength = 32; // Key length in bytes (32 * 8 = 256 bits)
             byte[] emailSalt = Encoding.UTF8.GetBytes(email);
             
@@ -29,7 +29,7 @@ namespace PW_Frontend.Helpers {
         /// <param name="masterKey">User's master key</param>
         /// <returns></returns>
         public static byte[] GenerateMasterHash(string masterPass, byte[] masterKey) {
-            const int iterations = 100000;
+            const int iterations = 1000; // 100k is waay too slow
             const int keyLength = 32; // Key length in bytes (32 * 8 = 256 bits)
             byte[] masterSalt = Encoding.UTF8.GetBytes(masterPass);
             

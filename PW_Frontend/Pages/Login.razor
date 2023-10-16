@@ -1,5 +1,4 @@
 ﻿@page "/Login"
-@using Pw_Frontend.Dtos.AuthDto
 @using Pw_Frontend.Application.Services
 @using PW_Frontend.Application.Dtos.AuthDto
 
@@ -10,13 +9,13 @@
 
 <div class="container card shadow rounded p-3 col-md-4">
     <h3>Login</h3>
-    <EditForm Model="loginDto">
+    <EditForm Model="_loginDto">
         <div class="form-floating">
-            <input type="email" class="form-control" @bind="loginDto.Email"/>
+            <input type="email" class="form-control" @bind="_loginDto.Email"/>
             <label>Email:</label>
         </div>
         <div class="form-floating">
-            <input type="password" class="form-control" @bind="loginDto.Password"/>
+            <input type="password" class="form-control" @bind="_loginDto.Password"/>
             <label>Password:</label>
         </div>
         <div class="btn-group w-100 mt-3">
@@ -27,11 +26,11 @@
 </div>
 
 @code {
-    LoginDto loginDto = new LoginDto();
+    readonly LoginDto _loginDto = new();
     
     private async Task LoginAsync()
     {
-        await AuthenticationService.Login(loginDto);
+        await AuthenticationService.Login(_loginDto);
         ToastService.ShowSuccess("Login successful");
         await Task.Delay(2000);
         NavigationManager.NavigateTo("/", replace: true);
@@ -39,7 +38,7 @@
     
     private async Task RegisterAsync()
     {
-        await AuthenticationService.Register(loginDto);
+        await AuthenticationService.Register(_loginDto);
         ToastService.ShowSuccess("Registration successful");
         NavigationManager.NavigateTo("/", replace: true);
     }
