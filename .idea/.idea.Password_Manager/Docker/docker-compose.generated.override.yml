@@ -1,0 +1,23 @@
+# This is a generated file. Not intended for manual editing.
+services:
+  pw_webapi:
+    build:
+      context: "/home/pennyboi/RiderProjects/Pw_Manager"
+      dockerfile: "Pw_WebApi/Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net7.0/Pw_WebApi.dll"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+      NUGET_PACKAGES: "/home/pennyboi/.nuget/packages"
+      NUGET_FALLBACK_PACKAGES: "/home/pennyboi/.nuget/packages"
+    image: "pw_webapi:dev"
+    ports: []
+    volumes:
+    - "/home/pennyboi/.nuget/packages:/root/.nuget/fallbackpackages"
+    - "/home/pennyboi/RiderProjects/Pw_Manager/Pw_WebApi:/app:rw"
+    - "/home/pennyboi/RiderProjects/Pw_Manager:/src:rw"
+    working_dir: "/app"

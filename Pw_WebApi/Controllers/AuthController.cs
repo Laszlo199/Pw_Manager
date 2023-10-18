@@ -17,7 +17,7 @@ public class AuthController : ControllerBase
         _securityService = securityService;
     }
     
-    //[AllowAnonymous] 
+    [AllowAnonymous] 
     [HttpPost(nameof(Login))]
     public ActionResult<TokenDto> Login([FromBody] LoginDto loginDto)
     {
@@ -31,7 +31,7 @@ public class AuthController : ControllerBase
         };
     }
     
-    //[AllowAnonymous]
+    [AllowAnonymous]
     [HttpPost(nameof(Register))]
     public ActionResult<TokenDto> Register([FromBody] LoginDto loginDto)
     {

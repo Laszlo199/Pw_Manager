@@ -23,12 +23,16 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    //c.OperationFilter<SecurityAuth>();
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Pw_WebApi",
+        Version = "v1"
+    });
+    c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
     {
         Name = "Authorization",
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer",
+        Type = SecuritySchemeType.Http,
+        Scheme = JwtBearerDefaults.AuthenticationScheme,
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
         Description = "JWT Authorization header using the Bearer scheme."
@@ -42,20 +46,12 @@ builder.Services.AddSwaggerGen(c =>
                 Reference = new OpenApiReference
                 {
                     Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
+                    Id = JwtBearerDefaults.AuthenticationScheme
                 }
             },
-            new string[] { }
+            new[] {""}
         }
     });
-    
-
-    c.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "Pw_WebApi",
-        Version = "v1"
-    });
-    
 });
 
 // CORS config
@@ -87,11 +83,11 @@ builder.Services.AddAuthentication(authentificationOptions =>
             ValidateIssuerSigningKey = true,
             IssuerSigningKey =
                 new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(builder.Configuration["Jwt:secret"])),
+                    Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"])),
             ValidateIssuer = true,
-            ValidIssuer = builder.Configuration["Jwt:issuer"],
-            ValidateAudience = true,
-            ValidAudience = builder.Configuration["Jwt:audience"],
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidateAudience = false,
+            //ValidAudience = builder.Configuration["Jwt:Audience"],
             ValidateLifetime = true
         };
     });
@@ -154,8 +150,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
-app.UseAuthentication();
 
-app.MapControllers();
+app.MapControllers().RequireAuthorization();
 
 app.Run();

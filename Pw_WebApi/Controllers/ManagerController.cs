@@ -1,11 +1,12 @@
 ﻿using Core.IServices;
 using Core.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Pw_WebApi.Dtos;
 using Pw_WebApi.Dtos.ManagerDto;
 
 namespace Pw_WebApi.Controllers;
-
+[Authorize]
 [Route("api/[controller]")]
 [ApiController]
 public class ManagerController: ControllerBase
@@ -34,7 +35,7 @@ public class ManagerController: ControllerBase
             return BadRequest(e.Message);
         }
     }
-
+    
     [HttpGet("GenerateRandomPassword/{lenght}")]
     public ActionResult GenerateRandomPassword(int lenght)
     {
