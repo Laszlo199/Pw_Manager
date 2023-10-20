@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text;
 using Core.IServices;
 using DataAcces;
@@ -5,6 +6,7 @@ using DataAcces.Repo;
 using Domain.IRepository;
 using Domain.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -13,6 +15,8 @@ using Pw_Security.Helper;
 using Pw_Security.IServices;
 using Pw_Security.Repositories;
 using Pw_Security.Services;
+using Pw_WebApi.Exceptions;
+using Pw_WebApi.Responses;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -138,6 +142,22 @@ void ManagerSeeder(IHost app)
         service.SeedDevelopment();
     }
 }
+
+// Error handling
+app.UseExceptionHandler(a => a.Run(async context => {
+    IExceptionHandlerPathFeature exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
+    Exception exception = exceptionHandlerPathFeature?.Error;
+    // string trace = context.TraceIdentifier;
+    string trace = Activity.Current?.Id ?? context.TraceIdentifier;
+    int statusCode = context.Response.StatusCode;
+    string type = "";
+    if (exception is RestException restException) {
+        context.Response.StatusCode = statusCode = (int)restException.Status;
+        type = restException.Code ?? "";
+    }
+
+    await context.Response.WriteAsJsonAsync(new ErrorResponse(type, statusCode, trace, exception?.Message ?? ""));
+}));
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
