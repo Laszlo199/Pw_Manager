@@ -40,6 +40,7 @@ namespace PW_Frontend.Helpers {
             return derivedKey;
         }
 
+        //TODO: I tried to stretch the masterKey before using it to encrypt the vault but It keeps throwing argumentErrors related to array length so I gave up for now :P
         /// <summary>
         /// Stretch a master key using HMAC from 256bit to 512bit
         /// </summary>
@@ -47,30 +48,36 @@ namespace PW_Frontend.Helpers {
         /// <returns></returns>
         public static byte[] GenerateStretchedMasterKey(byte[] masterKey) {
             using HMACSHA256 hmac = new();
-            // Initialize the HMAC with the input key
-            hmac.Key = masterKey;
-    
-            // Perform the HKDF extraction step
+
+            // Step 1: Extract the PRK (Pseudorandom Key) using the HMAC function
             byte[] prk = hmac.ComputeHash(masterKey);
-    
-            // Initialize the HMAC with the extracted PRK
-            hmac.Key = prk;
-                
-            byte[] info = Array.Empty<byte>();
-            int length = 64;    // Desired output length in bytes (64 * 8 = 512 bits)
 
-            // Calculate the expanded key using the HKDF expansion step
+            // Step 2: Expand the key using the HKDF expansion step
+            int length = 64; // Desired output length in bytes (64 * 8 = 512 bits)
             byte[] outputKey = new byte[length];
+    
+            // The OKM (Output Key Material) should be zero-initialized of the desired length
+            byte[] okm = new byte[length];
+    
+            byte[] info = Array.Empty<byte>();
+    
             byte[] t = Array.Empty<byte>();
-            int iterations = (int)Math.Ceiling((double)length / hmac.HashSize);
-
-            for (int i = 1; i <= iterations; i++)
+            for (int i = 1; i <= Math.Ceiling((double)length / hmac.HashSize); i++)
             {
-                t = hmac.ComputeHash(ConcatenateBytes(t, info, BitConverter.GetBytes(i)));
-                Array.Copy(t, 0, outputKey, (i - 1) * hmac.HashSize, Math.Min(hmac.HashSize, length - (i - 1) * hmac.HashSize));
+                byte[] prevT = t;
+
+                // Calculate the HMAC input for this iteration
+                byte[] input = ConcatenateBytes(prevT, info, BitConverter.GetBytes(i));
+        
+                // Compute the HMAC for this iteration
+                t = hmac.ComputeHash(input);
+        
+                // Copy the output of this iteration to the OKM
+                int copyLength = Math.Min(hmac.HashSize, length - (i - 1) * hmac.HashSize);
+                Array.Copy(t, 0, okm, (i - 1) * hmac.HashSize, copyLength);
             }
 
-            return outputKey;
+            return okm;
         }
 
         private static byte[] ConcatenateBytes(params byte[][] arrays)
