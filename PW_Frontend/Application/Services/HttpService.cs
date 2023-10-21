@@ -4,8 +4,12 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using Blazored.LocalStorage;
+using Blazored.Toast.Configuration;
+using Blazored.Toast.Services;
 using Microsoft.AspNetCore.Components;
+using Pw_Frontend.Application.Dtos;
 using Pw_Frontend.Dtos.AuthDto;
+using PW_Frontend.Shared;
 
 namespace Pw_Frontend.Application.Services;
 
@@ -26,17 +30,20 @@ public class HttpService : IHttpService
     private NavigationManager _navigationManager;
     private ILocalStorageService _localStorageService;
     private IConfiguration _configuration;
+    private IToastService _toastService;
 
     public HttpService(
         HttpClient httpClient,
         NavigationManager navigationManager,
         ILocalStorageService localStorageService,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        IToastService toastService)
     {
         _httpClient = httpClient;
         _navigationManager = navigationManager;
         _localStorageService = localStorageService;
         _configuration = configuration;
+        _toastService = toastService;
     }
 
     public async Task<T?> Get<T>(string uri)
@@ -110,15 +117,16 @@ public class HttpService : IHttpService
         }
 
         // 403 response
-        if (response.StatusCode == HttpStatusCode.Forbidden)
-        {
-            throw new Exception("You do not have permission to access this resource.");
+        if (response.StatusCode == HttpStatusCode.Forbidden) {
+            _toastService.ShowError("You do not have permission to access this resource.");
+            return default!;
         }
 
         // throw exception on error response
-        if (!response.IsSuccessStatusCode)
-        {
-            throw new Exception();
+        if (!response.IsSuccessStatusCode) {
+            var errorResponse = await response.Content.ReadFromJsonAsync<ErrorResponseDto>();
+            _toastService.ShowError(errorResponse is not null ? errorResponse.Error : "Unknown Exception occured!");
+            return default!;
         }
         return await response.Content.ReadFromJsonAsync<T>();
     }

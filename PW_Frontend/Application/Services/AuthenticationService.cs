@@ -11,8 +11,8 @@ public interface IAuthenticationService
     TokenDto? TokenDto { get; }
     byte[]? StretchedKey { get; }
     Task Initialize();
-    Task Register(LoginDto loginDto);
-    Task Login(LoginDto loginDto);
+    Task<bool> Register(LoginDto loginDto);
+    Task<bool> Login(LoginDto loginDto);
     Task Logout();
 }
 
@@ -41,23 +41,28 @@ public class AuthenticationService : IAuthenticationService
         StretchedKey = await _localStorageService.GetItemAsync<byte[]>("stretchedKey");
     }
 
-    public async Task Register(LoginDto loginDto)
+    public async Task<bool> Register(LoginDto loginDto)
     {
         byte[] masterKey = EncryptionHelper.GenerateMasterKey(loginDto.Email, loginDto.Password);
         var masterHash = EncryptionHelper.GenerateMasterHash(loginDto.Password, masterKey);
         loginDto.Password = System.Text.Encoding.UTF8.GetString(masterHash);
         await _httpService.Post("/api/Auth/Register", loginDto);
-        loginDto.Password = string.Empty;
+        return true;
     }
-    public async Task Login(LoginDto loginDto) {
+    
+    public async Task<bool> Login(LoginDto loginDto) {
         byte[] masterKey = EncryptionHelper.GenerateMasterKey(loginDto.Email, loginDto.Password);
         var masterHash = EncryptionHelper.GenerateMasterHash(loginDto.Password, masterKey);
+        
         loginDto.Password = System.Text.Encoding.UTF8.GetString(masterHash);
         TokenDto = await _httpService.Post<TokenDto>("/api/Auth/login", loginDto);
-        loginDto.Password = string.Empty;
+        if (TokenDto is null) {
+            return false;
+        }
         byte[] stretchedKey = EncryptionHelper.GenerateStretchedMasterKey(masterKey);
         await _localStorageService.SetItemAsync("stretchedKey", stretchedKey);
         await _localStorageService.SetItemAsync("tokenDto", TokenDto);
+        return true;
     }
 
     public async Task Logout()
