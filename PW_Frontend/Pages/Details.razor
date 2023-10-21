@@ -32,7 +32,7 @@
     protected async override Task OnInitializedAsync()
     {
         var userId = AuthenticationService.TokenDto?.UserId;
-        byte[]? stretchedKey = AuthenticationService.StretchedKey;
+        byte[]? stretchedKey = AuthenticationService.MasterKey;
         if (userId is null || stretchedKey is null)
         {
             NavigationManager.NavigateTo("/Login");

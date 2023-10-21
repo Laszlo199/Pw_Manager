@@ -48,7 +48,7 @@
         var success = await AuthenticationService.Login(_loginDto);
         if (success) {
             ToastService.ShowSuccess("Login successful");
-            await Task.Delay(2000);
+            await Task.Delay(1000);
             NavigationManager.NavigateTo("/", replace: true);
         }
     }

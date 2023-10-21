@@ -36,8 +36,8 @@
     protected async override Task OnInitializedAsync()
     {
         var userId = AuthenticationService.TokenDto?.UserId;
-        byte[]? stretchedKey = AuthenticationService.StretchedKey;
-        if (userId is null || stretchedKey is null)
+        byte[]? masterKey = AuthenticationService.MasterKey;
+        if (userId is null || masterKey is null)
         {
             NavigationManager.NavigateTo("/Login");
         }
@@ -47,7 +47,7 @@
 
     private async Task Save() {
         var newPassDto = CreateNewPasswordDto;
-        byte[]? stretchedKey = AuthenticationService.StretchedKey;
+        byte[]? stretchedKey = AuthenticationService.MasterKey;
         newPassDto.Password = await CryptoInteropService.DecryptData(newPassDto.Password, stretchedKey);
         await HttpService.Post("api/Manager/CreateNewPassword", CreateNewPasswordDto);
         NavigationManager.NavigateTo("/");
@@ -55,11 +55,11 @@
 
     private async Task GenerateStrongPassword(int length = 16)
     {
-        var password = await HttpService.Get<PasswordDto>($"api/Manager/GenerateRandomPassword/{length}");
+        var password = await HttpService.Get<string>($"api/Manager/GenerateRandomPassword/{length}");
         if (password == null)
         {
             return;
         }
-        CreateNewPasswordDto.Password = password.Password;
+        CreateNewPasswordDto.Password = password;
     }
 }

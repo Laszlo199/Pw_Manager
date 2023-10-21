@@ -39,7 +39,7 @@
     protected async override Task OnInitializedAsync()
     {
         int? userId = AuthenticationService.TokenDto?.UserId;
-        byte[]? stretchedKey = AuthenticationService.StretchedKey;
+        byte[]? stretchedKey = AuthenticationService.MasterKey;
         if (userId is null || stretchedKey is null)
         {
             NavigationManager.NavigateTo("/Login");
@@ -59,7 +59,7 @@
     }
     
     private async Task Save() {
-        byte[]? stretchedKey = AuthenticationService.StretchedKey;
+        byte[]? stretchedKey = AuthenticationService.MasterKey;
         var updatedPassDto = UpdatePasswordDto;
         updatedPassDto.Password = await CryptoInteropService.DecryptData(updatedPassDto.Password, stretchedKey);
         await HttpService.Put("api/Manager/UpdatePassword", updatedPassDto);
