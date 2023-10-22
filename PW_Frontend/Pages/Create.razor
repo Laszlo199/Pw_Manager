@@ -47,8 +47,8 @@
 
     private async Task Save() {
         var newPassDto = CreateNewPasswordDto;
-        byte[]? stretchedKey = AuthenticationService.MasterKey;
-        newPassDto.Password = await CryptoInteropService.DecryptData(newPassDto.Password, stretchedKey);
+        byte[]? masterKey = AuthenticationService.MasterKey;
+        newPassDto.Password = await CryptoInteropService.DecryptData(newPassDto.Password, masterKey);
         await HttpService.Post("api/Manager/CreateNewPassword", CreateNewPasswordDto);
         NavigationManager.NavigateTo("/");
     }

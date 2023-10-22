@@ -1,8 +1,10 @@
-﻿using System.Security.Cryptography;
+﻿using System.Net;
+using System.Security.Cryptography;
 using Core.Models;
 using DataAcces.Entity;
 using Domain.IRepository;
 using Microsoft.EntityFrameworkCore;
+using Pw_WebApi.Exceptions;
 
 namespace DataAcces.Repo;
 
@@ -15,77 +17,57 @@ public class ManagerRepository: IManagerRepository
         _ctx = context;
        
     }
-    public IQueryable<Passwords> GetAllPasswordsByUserId(int userId)
+    public List<PasswordModel> GetAllPasswordsByUserId(int userId)
     {
         var passwords = _ctx.Passwords
             .Where(c => c.UserEntity.Id == userId)
-            .Select(ca => new Passwords()
+            .Select(ca => new PasswordModel
             {
                 Id = ca.Id,
                 Email = ca.Email,
                 WebsiteName = ca.WebsiteName,
                 Password = ca.Password,
-            });
+            }).ToList();
         return passwords;
     }
 
-    public Passwords Create(Passwords newPassword)
-    {
-        var transformer = new Transformer.Transformer();
-        var model = new PasswordEntity()
-        {
+    public PasswordModel Create(PasswordModel newPassword) {
+        var userEntity = _ctx.Users.FirstOrDefault(user => user.Id == newPassword.User.Id);
+        if (userEntity is null) {
+            throw new RestException(HttpStatusCode.NotFound, "User Not found");
+        }
+        var model = new PasswordEntity {
             Id = newPassword.Id,
             Email = newPassword.Email,
             WebsiteName = newPassword.WebsiteName,
-            Password = transformer.EncryptPassword(newPassword.Password),
+            Password = newPassword.Password,
             DateCreated = DateTime.Today,
-            UserEntity = new UserEntity()
-            {
-                Id = newPassword.User.Id,
-                Email = newPassword.User.Email,
-                PasswordHash = newPassword.User.PasswordHash,
-                PasswordSalt = newPassword.User.PasswordSalt
-            }
-            
-            
+            UserEntity = userEntity
         };
         _ctx.Attach(model).State = EntityState.Added;
         _ctx.SaveChanges();
         return newPassword;
     }
 
-    public Passwords Delete(int passwordId)
-    {
-        var passwordDelete = _ctx.Passwords
+    public void Delete(int passwordId) {
+        var passwordToDelete = _ctx.Passwords
             .Include(de=>de.UserEntity)
             .FirstOrDefault(d => d.Id == passwordId);
-        _ctx.Passwords.Remove(passwordDelete);
+        if (passwordToDelete is null) {
+            throw new RestException(HttpStatusCode.NotFound, "Password Not found");
+        }
+        _ctx.Passwords.Remove(passwordToDelete);
         _ctx.SaveChanges();
-        
-        return new Passwords()
-        {
-            Id = passwordDelete.Id,
-            Email = passwordDelete.Email,
-            WebsiteName = passwordDelete.WebsiteName,
-            Password = passwordDelete.Password,
-            DateCreated = passwordDelete.DateCreated,
-            User = new User
-            {
-                Id = passwordDelete.UserEntity.Id,
-                Email = passwordDelete.UserEntity.Email
-            }
-        };
     }
 
-    public Passwords Update(Passwords password)
+    public PasswordModel Update(PasswordModel password)
     {
-        var transformer = new Transformer.Transformer();
-        _ctx.Attach(new PasswordEntity()
+        _ctx.Attach(new PasswordEntity
         {
             Id = password.Id,
             WebsiteName = password.WebsiteName,
             Email = password.Email,
-            Password = transformer.EncryptPassword(password.Password)
+            Password = password.Password
         }).State = EntityState.Modified;
         _ctx.SaveChanges();
 
@@ -100,17 +82,12 @@ public class ManagerRepository: IManagerRepository
      const string specialChars = "!@#$%^&*()-_=+[]{}|;:'\",.<>?";
      
      const string allChars = lowercaseChars + uppercaseChars + numericChars + specialChars;
-     
-        if (length < 7 || length > 20)
-        {
-            throw new ArgumentOutOfRangeException("length", "Password length must be between 7 and 20 characters.");
-        }
         
         string charSet = allChars;
 
         // Generate a random password with RNGCryptoServiceProvider
         char[] password = new char[length];
-        using (RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider())
+        using (RNGCryptoServiceProvider rng = new())
         {
             byte[] randomBytes = new byte[length];
             rng.GetBytes(randomBytes);
@@ -122,21 +99,22 @@ public class ManagerRepository: IManagerRepository
         }
 
         // Shuffle the characters in the password
-        Random random = new Random();
+        Random random = new();
         password = password.OrderBy(c => random.Next()).ToArray();
 
         return new string(password);
     }
 
-    public IQueryable<Passwords> GetPasswordsById( int id)
-    {
-        var transformer = new Transformer.Transformer();
-        return _ctx.Passwords.Where(c =>c.Id == id).Select(ca => new Passwords()
-        {
-            Id = ca.Id,
-            Email = ca.Email,
-            WebsiteName = ca.WebsiteName,
-            Password = transformer.DecryptPassword(ca.Password),
-        });
+    public PasswordModel GetPasswordById( int id) {
+        var entity = _ctx.Passwords.FirstOrDefault(pass => pass.Id == id);
+        if (entity is null) {
+            throw new RestException(HttpStatusCode.NotFound, "Password Not found");
+        }
+        return new PasswordModel {
+            Id = entity.Id,
+            Email = entity.Email,
+            WebsiteName = entity.WebsiteName,
+            Password = entity.Password
+        };
     }
 }

@@ -4,10 +4,10 @@ namespace Domain.IRepository;
 
 public interface IManagerRepository
 {
-    IQueryable<Passwords> GetAllPasswordsByUserId(int id);
-    Passwords Create(Passwords newPassword);
-    Passwords Delete(int passwordId);
-    Passwords Update(Passwords password);
+    List<PasswordModel> GetAllPasswordsByUserId(int id);
+    PasswordModel Create(PasswordModel newPassword);
+    void Delete(int passwordId);
+    PasswordModel Update(PasswordModel password);
     string RandomPasswordGenerator(int length);
-    IQueryable<Passwords> GetPasswordsById( int id);
+    PasswordModel GetPasswordById(int id);
 }

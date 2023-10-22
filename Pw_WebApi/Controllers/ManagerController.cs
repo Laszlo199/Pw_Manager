@@ -1,11 +1,12 @@
-﻿using Core.IServices;
+﻿using System.ComponentModel.DataAnnotations;
+using Core.IServices;
 using Core.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Pw_WebApi.Dtos;
+using Pw_WebApi.BindingModels;
 using Pw_WebApi.Dtos.ManagerDto;
-
 namespace Pw_WebApi.Controllers;
+
 [Authorize]
 [Route("api/[controller]")]
 [ApiController]
@@ -18,107 +19,45 @@ public class ManagerController: ControllerBase
     }
     
     [HttpGet("GetAllByUserId/{userId}")]
-    public ActionResult<List<GetAllByUserIdDto>> GetAllByUserId(int userId)
-    {
-        try
-        {
-            return Ok(_service.GetAllPasswordsByUserId(userId)
-                .Select(p => new GetAllByUserIdDto()
-                {
-                    WebsiteName = p.WebsiteName,
-                    Email = p.Email,
-                    Password = p.Password,
-                }));
-        }
-        catch (Exception e)
-        {
-            return BadRequest(e.Message);
-        }
+    public ActionResult GetAllByUserId(int userId) {
+        return Ok(_service.GetAllPasswordsByUserId(userId).Select(pass => new PasswordDto(pass)));
     }
-    
-    [HttpGet("GenerateRandomPassword/{lenght}")]
-    public ActionResult GenerateRandomPassword(int lenght)
-    {
-        try
-        {
-            return Ok(_service.RandomPasswordGenerator(lenght));
-        }
-        catch (Exception e)
-        {
-            return BadRequest(e.Message);
-        }
+
+    [HttpGet("GenerateRandomPassword/{length:int}")]
+    public ActionResult GenerateRandomPassword([Range(7, 64)] int length) {
+        return Ok(_service.RandomPasswordGenerator(length));
     }
-    
+
     [HttpPost("CreateNewPassword")]
-    public ActionResult<Passwords> CreateNewPassword([FromBody] CreateNewPasswordDto postNewPasswordDto)
-    {
-        if (postNewPasswordDto == null)
-            throw new InvalidDataException("deck cannot be null");
-          
-        try
-        {
-            return Ok(_service.Create(new Passwords()
-            {
-                Email = postNewPasswordDto.Email,
-                WebsiteName = postNewPasswordDto.WebsiteName,
-                Password = postNewPasswordDto.Password,
-                User = new User{Id = postNewPasswordDto.UserId}
-            }));
-        }
-        catch (Exception e)
-        {
-            return BadRequest(e.Message);
-        }
+    public ActionResult CreateNewPassword([FromBody] [Required] PasswordPostBindingModel model) {
+        return Ok(
+            new PasswordDto(_service.Create(new PasswordModel {
+                WebsiteName = model.WebsiteName,
+                Email = model.Email,
+                Password = model.Password,
+                User = new User{Id = model.UserId}
+        })));
     }
     
     [HttpDelete("DeletePassword/{passwordId}")]
-    public ActionResult<Passwords> Delete(int passwordId)
-    {
-        try
-        {
-            return Ok(_service.Delete(passwordId));
-        }
-        catch (Exception e)
-        {
-            return BadRequest(e.Message);
-        }
+    public ActionResult Delete(int passwordId) {
+        _service.Delete(passwordId);
+        return Ok();
     }
     
     [HttpPut("UpdatePassword")]
-    public ActionResult<Passwords> Update([FromBody] UpdatePasswordDto passwordDto)
-    {
-        if (passwordDto == null) throw new InvalidDataException("Password to update cannot be null");
-        try
-        {
-            return Ok(_service.Update(new Passwords()
-            {
-                Id = passwordDto.Id,
-                Email = passwordDto.Email,
-                WebsiteName = passwordDto.WebsiteName,
-                Password = passwordDto.Password
-            }));
-        }
-        catch (Exception e)
-        {
-            return BadRequest(e.Message);
-        }
+    public ActionResult Update([Required] [FromBody] PasswordPutBindingModel model) {
+        return Ok(
+            new PasswordDto(_service.Update(new PasswordModel{
+            Id = model.Id,
+            WebsiteName = model.WebsiteName,
+            Email = model.Email,
+            Password = model.Password
+        })));
     }
+    
     [HttpGet("GetPasswordById/{passwordId}")]
-    public ActionResult<GetAllByUserIdDto> GetPasswordById(int passwordId)
-    {
-        try
-        {
-            return Ok(_service.GetPasswordsById( passwordId)
-                .Select(p => new GetAllByUserIdDto()
-                {
-                    WebsiteName = p.WebsiteName,
-                    Email = p.Email,
-                    Password = p.Password,
-                }));
-        }
-        catch (Exception e)
-        {
-            return BadRequest(e.Message);
-        }
+    public ActionResult GetPasswordById(int passwordId) {
+        return Ok(new PasswordDto(_service.GetPasswordById(passwordId)));
     }
 }
