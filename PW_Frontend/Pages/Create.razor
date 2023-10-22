@@ -1,8 +1,7 @@
 ﻿@page "/Create"
 @using Pw_Frontend.Application.Services
-@using Pw_Frontend.Dtos.ManagerDto
-@using Pw_Frontend.Application.Dtos
-@using PW_Frontend.Service
+@using PW_Frontend.Application.BindingModels
+@using PW_Frontend.Application.Services
 @inject IAuthenticationService AuthenticationService
 @inject NavigationManager NavigationManager
 @inject IHttpService HttpService
@@ -10,18 +9,18 @@
 
 <div class="container card shadow rounded p-3 col-md-4">
     <h3>Create new password</h3>
-    <EditForm Model="CreateNewPasswordDto">
+    <EditForm Model="PasswordPostBindingModel">
         <div class="form-floating">
-            <input type="text" class="form-control" @bind="CreateNewPasswordDto.WebsiteName"/>
+            <input type="text" class="form-control" @bind="PasswordPostBindingModel.WebsiteName"/>
             <label>Website:</label>
         </div>
         <div class="form-floating">
-            <input type="email" class="form-control" @bind="CreateNewPasswordDto.Email"/>
+            <input type="email" class="form-control" @bind="PasswordPostBindingModel.Email"/>
             <label>Email:</label>
         </div>
         <button class="btn btn-secondary w-100" @onclick="() => GenerateStrongPassword()">Generate strong password</button>
         <div class="form-floating">
-            <input type="password" class="form-control" @bind="CreateNewPasswordDto.Password"/>
+            <input type="text" class="form-control" @bind="PasswordPostBindingModel.Password"/>
             <label>Password:</label>
         </div>
         <div class="btn-group w-100 mt-3">
@@ -31,7 +30,7 @@
 </div>
 
 @code {
-    public CreateNewPasswordDto CreateNewPasswordDto { get; set; } = new();
+    public PasswordPostBindingModel PasswordPostBindingModel { get; set; } = new();
 
     protected async override Task OnInitializedAsync()
     {
@@ -41,15 +40,18 @@
         {
             NavigationManager.NavigateTo("/Login");
         }
-        CreateNewPasswordDto.UserId = AuthenticationService.TokenDto!.UserId;
+        PasswordPostBindingModel.UserId = AuthenticationService.TokenDto!.UserId;
         await base.OnInitializedAsync();
     }
 
     private async Task Save() {
-        var newPassDto = CreateNewPasswordDto;
+        var newPassDto = PasswordPostBindingModel;
         byte[]? masterKey = AuthenticationService.MasterKey;
-        newPassDto.Password = await CryptoInteropService.DecryptData(newPassDto.Password, masterKey);
-        await HttpService.Post("api/Manager/CreateNewPassword", CreateNewPasswordDto);
+        
+        string keyHex = BitConverter.ToString(masterKey).Replace("-", "").ToLower();
+        
+        newPassDto.Password = await CryptoInteropService.EncryptData(newPassDto.Password,masterKey);
+        await HttpService.Post("api/Manager/CreateNewPassword", PasswordPostBindingModel);
         NavigationManager.NavigateTo("/");
     }
 
@@ -60,6 +62,6 @@
         {
             return;
         }
-        CreateNewPasswordDto.Password = password;
+        PasswordPostBindingModel.Password = password;
     }
 }

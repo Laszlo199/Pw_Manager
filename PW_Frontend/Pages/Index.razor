@@ -1,6 +1,6 @@
 ﻿@page "/"
-@using Pw_Frontend.Dtos.ManagerDto
 @using Pw_Frontend.Application.Services
+@using PW_Frontend.Application.Dtos.ManagerDto
 @inject IHttpService HttpService
 @inject IAuthenticationService AuthenticationService
 @inject NavigationManager NavigationManager
@@ -48,33 +48,27 @@ else
 }
 
 @code {
-    private List<GetAllByUserIdDto>? Passwords { get; set; }
-    protected async override Task OnInitializedAsync()
-    {
+    private List<PasswordDto>? Passwords { get; set; }
+    protected async override Task OnInitializedAsync() {
         var token = AuthenticationService.TokenDto;
-        if (token is null)
-        {
+        if (token is null) {
             return;
         }
-        var passwords = await HttpService.Get<List<GetAllByUserIdDto>>($"api/Manager/GetAllByUserId/{token.UserId}");
-        if (passwords is not null)
-        {
+        var passwords = await HttpService.Get<List<PasswordDto>>($"api/Manager/GetAllByUserId/{token.UserId}");
+        if (passwords is not null) {
             Passwords = passwords;
         }
         await base.OnInitializedAsync();
     }
 
-    private async Task ShowPassword(int pswdId)
-    {
+    private async Task ShowPassword(int pswdId) {
         NavigationManager.NavigateTo($"/Details/{pswdId}");
     }
-    private async Task UpdatePassword(int pswdId)
-    {
+    private async Task UpdatePassword(int pswdId) {
         NavigationManager.NavigateTo($"/Update/{pswdId}");
     }
 
-    private async Task DeletePassword(int psswdId)
-    {
+    private async Task DeletePassword(int psswdId) {
         await HttpService.Delete($"/Api/Manager/DeletePassword/{psswdId}");
         await OnInitializedAsync();
     }

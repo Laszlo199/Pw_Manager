@@ -1,7 +1,7 @@
 ﻿@page "/Details/{id:int}"
 @using Pw_Frontend.Application.Services
-@using Pw_Frontend.Dtos.ManagerDto
-@using PW_Frontend.Service
+@using PW_Frontend.Application.Dtos.ManagerDto
+@using PW_Frontend.Application.Services
 @inject IHttpService HttpService
 @inject NavigationManager NavigationManager
 @inject CryptoInteropService CryptoInteropService
@@ -10,15 +10,15 @@
 <div class="container card shadow rounded p-3 col-md-4">
     <h3>Details</h3>
     <div class="form-floating">
-        <input type="text" class="form-control" @bind="GetAllByUserIdDto.WebsiteName" disabled/>
+        <input type="text" class="form-control" @bind="PasswordDto.WebsiteName" disabled/>
         <label>Website:</label>
     </div>
     <div class="form-floating">
-        <input type="email" class="form-control" @bind="GetAllByUserIdDto.Email" disabled/>
+        <input type="email" class="form-control" @bind="PasswordDto.Email" disabled/>
         <label>Email:</label>
     </div>
     <div class="form-floating">
-        <input type="text" class="form-control" @bind="GetAllByUserIdDto.Password" disabled/>
+        <input type="text" class="form-control" @bind="PasswordDto.Password" disabled/>
         <label>Password:</label>
     </div>
 </div>
@@ -27,24 +27,20 @@
     [Parameter]
     public int Id { get; set; }
 
-    private GetAllByUserIdDto GetAllByUserIdDto { get; set; } = new();
+    private PasswordDto PasswordDto { get; set; } = new();
 
-    protected async override Task OnInitializedAsync()
-    {
+    protected async override Task OnInitializedAsync() {
         var userId = AuthenticationService.TokenDto?.UserId;
-        byte[]? stretchedKey = AuthenticationService.MasterKey;
-        if (userId is null || stretchedKey is null)
-        {
+        byte[]? masterKey = AuthenticationService.MasterKey;
+        if (userId is null || masterKey is null) {
             NavigationManager.NavigateTo("/Login");
         }
-        var getAllByUserIdDto = (await HttpService.Get<List<GetAllByUserIdDto>>($"api/Manager/GetPasswordById/{Id}"))?
-            .FirstOrDefault();
-        if (getAllByUserIdDto is null)
-        {
+        var passwordDto = await HttpService.Get<PasswordDto>($"api/Manager/GetPasswordById/{Id}");
+        if (passwordDto is null) {
             return;
         }
-        getAllByUserIdDto.Password = await CryptoInteropService.DecryptData(getAllByUserIdDto.Password, stretchedKey);
-        GetAllByUserIdDto = getAllByUserIdDto;
+        passwordDto.Password = await CryptoInteropService.DecryptData(passwordDto.Password, masterKey);
+        PasswordDto = passwordDto;
         await base.OnInitializedAsync();
     }
 
