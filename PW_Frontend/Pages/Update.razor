@@ -46,23 +46,21 @@
             NavigationManager.NavigateTo("/Login");
         }
         
-        var getAllByUserIdDto = (await HttpService.Get<List<PasswordDto>>($"api/Manager/GetPasswordById/{Id}"))?
-            .FirstOrDefault();
-        if (getAllByUserIdDto is null)
-        {
+        var passwordDto = await HttpService.Get<PasswordDto>($"api/Manager/GetPasswordById/{Id}");
+        if (passwordDto is null) {
             return;
         }
-        PasswordPutBindingModel.Id = getAllByUserIdDto.Id;
-        PasswordPutBindingModel.Password = await CryptoInteropService.DecryptData(getAllByUserIdDto.Password, stretchedKey);
-        PasswordPutBindingModel.Email = getAllByUserIdDto.Email;
-        PasswordPutBindingModel.WebsiteName = getAllByUserIdDto.WebsiteName;
+        PasswordPutBindingModel.Id = passwordDto.Id;
+        PasswordPutBindingModel.Password = await CryptoInteropService.DecryptData(passwordDto.Password, stretchedKey);
+        PasswordPutBindingModel.Email = passwordDto.Email;
+        PasswordPutBindingModel.WebsiteName = passwordDto.WebsiteName;
         await base.OnInitializedAsync();
     }
     
     private async Task Save() {
         byte[]? stretchedKey = AuthenticationService.MasterKey;
         var updatedPassDto = PasswordPutBindingModel;
-        updatedPassDto.Password = await CryptoInteropService.DecryptData(updatedPassDto.Password, stretchedKey);
+        updatedPassDto.Password = await CryptoInteropService.EncryptData(updatedPassDto.Password, stretchedKey);
         await HttpService.Put("api/Manager/UpdatePassword", updatedPassDto);
         NavigationManager.NavigateTo("/");
     }
