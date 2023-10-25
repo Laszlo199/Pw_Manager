@@ -1,0 +1,49 @@
+﻿@page "/Details/{id:int}"
+@using Pw_Frontend.Application.Services
+@using PW_Frontend.Application.Dtos.ManagerDto
+@using PW_Frontend.Application.Services
+@inject IHttpService HttpService
+@inject NavigationManager NavigationManager
+@inject CryptoInteropService CryptoInteropService
+@inject IAuthenticationService AuthenticationService
+
+<div class="container card shadow rounded p-3 col-md-4">
+    <h3>Details</h3>
+    <div class="form-floating">
+        <input type="text" class="form-control" @bind="PasswordDto.WebsiteName" disabled/>
+        <label>Website:</label>
+    </div>
+    <div class="form-floating">
+        <input type="email" class="form-control" @bind="PasswordDto.Email" disabled/>
+        <label>Email:</label>
+    </div>
+    <div class="form-floating">
+        <input type="text" class="form-control" @bind="PasswordDto.Password" disabled/>
+        <label>Password:</label>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private PasswordDto PasswordDto { get; set; } = new();
+
+    protected async override Task OnInitializedAsync() {
+        var userId = AuthenticationService.TokenDto?.UserId;
+        byte[]? masterKey = AuthenticationService.MasterKey;
+        if (userId is null || masterKey is null) {
+            NavigationManager.NavigateTo("/Login");
+        }
+        var passwordDto = await HttpService.Get<PasswordDto>($"api/Manager/GetPasswordById/{Id}");
+        if (passwordDto is null) {
+            return;
+        }
+        // Decrypt the email and password before displaying it to the user
+        passwordDto.Email = await CryptoInteropService.DecryptData(passwordDto.Email, masterKey);
+        passwordDto.Password = await CryptoInteropService.DecryptData(passwordDto.Password, masterKey);
+        PasswordDto = passwordDto;
+        await base.OnInitializedAsync();
+    }
+
+}

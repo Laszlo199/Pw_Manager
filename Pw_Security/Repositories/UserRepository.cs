@@ -1,3 +1,4 @@
+using System.Text;
 using Core.Models;
 using DataAcces;
 using DataAcces.Entity;
@@ -45,6 +46,8 @@ public class UserRepository: IUserRepository
             PasswordHash = user.PasswordHash,
             PasswordSalt = user.PasswordSalt
         });
+        var passHashString = Convert.ToBase64String(createdUser.Entity.PasswordHash);
+        var passSaltString = Convert.ToBase64String(createdUser.Entity.PasswordSalt);
         _pwManagerContext.SaveChanges();
         return createdUser != null;
     }

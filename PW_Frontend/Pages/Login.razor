@@ -1,0 +1,64 @@
+﻿@page "/Login"
+@using Pw_Frontend.Application.Services
+@using PW_Frontend.Application.Dtos.AuthDto
+@using System.ComponentModel.DataAnnotations
+
+@inject IAuthenticationService AuthenticationService
+@inject NavigationManager NavigationManager
+@inject IToastService ToastService
+@layout BlankLayout
+
+<div class="container card shadow rounded p-3 col-md-4">
+    <h3>Login</h3>
+    <EditForm Model="_loginDto">
+        <div class="form-floating">
+            <input type="email" class="form-control" @bind="_loginDto.Email"/>
+            <label>Email:</label>
+            <ValidationMessage For="@(() => _loginDto.Email)" />
+        </div>
+        <div class="form-floating">
+            <input type="password" class="form-control" @bind="Password"/>
+            <label>Password:</label>
+            <ValidationMessage For="@(() => Password)" />
+        </div>
+        <div class="btn-group w-100 mt-3">
+            <button class="btn btn-primary" type="submit" disabled="@IsSubmitDisabled" @onclick="LoginAsync">Login</button>
+            <button class="btn btn-secondary" type="submit" disabled="@IsSubmitDisabled"  @onclick="RegisterAsync">Register</button>
+        </div>
+    </EditForm>
+</div>
+
+@code {
+    readonly LoginDto _loginDto = new();
+    
+    [Required(ErrorMessage = "Password is required.")]
+    public string Password {
+        get => _password;
+        set{
+            _password = value;
+            _loginDto.Password = value;
+        }
+    }
+    
+    private string _password = "";
+    private bool IsSubmitDisabled => _loginDto.Password == "" || _loginDto.Email == ""; 
+    
+    private async Task LoginAsync()
+    {
+        var success = await AuthenticationService.Login(_loginDto);
+        if (success) {
+            ToastService.ShowSuccess("Login successful");
+            await Task.Delay(1000);
+            NavigationManager.NavigateTo("/", replace: true);
+        }
+    }
+    
+    private async Task RegisterAsync()
+    {
+        var success = await AuthenticationService.Register(_loginDto);
+        if (success) {
+            ToastService.ShowSuccess("Registration successful");
+            NavigationManager.NavigateTo("/", replace: true);
+        }
+    }
+}

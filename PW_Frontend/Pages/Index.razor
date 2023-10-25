@@ -1,0 +1,76 @@
+﻿@page "/"
+@using Pw_Frontend.Application.Services
+@using PW_Frontend.Application.Dtos.ManagerDto
+@inject IHttpService HttpService
+@inject IAuthenticationService AuthenticationService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Index</PageTitle>
+
+@if (Passwords == null)
+{
+    <h3>Loading...</h3>
+}
+else if(Passwords.Count == 0)
+{
+    <h3>You have no passwords</h3>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Site</th>
+            <th>Email</th>
+            <th>Password</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var password in Passwords)
+        {
+            <tr>
+                <td>@password.WebsiteName</td>
+                <td>@password.Email</td>
+                <td>@password.Password</td>
+                <td>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" @onclick="() => ShowPassword(password.Id)">Show password</button>
+                        <button class="btn btn-primary" @onclick="() => UpdatePassword(password.Id)">Update</button>
+                        <button class="btn btn-danger" @onclick="() => DeletePassword(password.Id)">Delete</button>
+                    </div>
+                </td>
+            </tr>
+        }
+        
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<PasswordDto>? Passwords { get; set; }
+    protected async override Task OnInitializedAsync() {
+        var token = AuthenticationService.TokenDto;
+        if (token is null) {
+            return;
+        }
+        var passwords = await HttpService.Get<List<PasswordDto>>($"api/Manager/GetAllByUserId/{token.UserId}");
+        if (passwords is not null) {
+            Passwords = passwords;
+        }
+        await base.OnInitializedAsync();
+    }
+
+    private async Task ShowPassword(int pswdId) {
+        NavigationManager.NavigateTo($"/Details/{pswdId}");
+    }
+    private async Task UpdatePassword(int pswdId) {
+        NavigationManager.NavigateTo($"/Update/{pswdId}");
+    }
+
+    private async Task DeletePassword(int psswdId) {
+        await HttpService.Delete($"/Api/Manager/DeletePassword/{psswdId}");
+        await OnInitializedAsync();
+    }
+
+}

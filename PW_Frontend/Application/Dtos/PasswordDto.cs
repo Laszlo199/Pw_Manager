@@ -1,0 +1,6 @@
+﻿namespace Pw_Frontend.Application.Dtos;
+
+public class PasswordDto
+{
+    public string Password { get; set; }
+}

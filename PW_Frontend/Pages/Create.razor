@@ -1,0 +1,71 @@
+﻿@page "/Create"
+@using Pw_Frontend.Application.Services
+@using PW_Frontend.Application.BindingModels
+@using PW_Frontend.Application.Dtos.ManagerDto
+@using PW_Frontend.Application.Services
+@inject IAuthenticationService AuthenticationService
+@inject NavigationManager NavigationManager
+@inject IHttpService HttpService
+@inject CryptoInteropService CryptoInteropService
+
+<div class="container card shadow rounded p-3 col-md-4">
+    <h3>Create new password</h3>
+    <EditForm Model="PasswordPostBindingModel">
+        <div class="form-floating">
+            <input type="text" class="form-control" @bind="PasswordPostBindingModel.WebsiteName"/>
+            <label>Website:</label>
+        </div>
+        <div class="form-floating">
+            <input type="email" class="form-control" @bind="PasswordPostBindingModel.Email"/>
+            <label>Email:</label>
+        </div>
+        <button class="btn btn-secondary w-100" @onclick="() => GenerateStrongPassword()">Generate strong password</button>
+        <div class="form-floating">
+            <input type="text" class="form-control" @bind="PasswordPostBindingModel.Password"/>
+            <label>Password:</label>
+        </div>
+        <div class="btn-group w-100 mt-3">
+            <button class="btn btn-primary" type="submit" @onclick="Save">Save password</button>
+        </div>
+    </EditForm>
+</div>
+
+@code {
+    public PasswordPostBindingModel PasswordPostBindingModel { get; set; } = new();
+
+    protected async override Task OnInitializedAsync()
+    {
+        var userId = AuthenticationService.TokenDto?.UserId;
+        byte[]? masterKey = AuthenticationService.MasterKey;
+        if (userId is null || masterKey is null)
+        {
+            NavigationManager.NavigateTo("/Login");
+        }
+        PasswordPostBindingModel.UserId = AuthenticationService.TokenDto!.UserId;
+        await base.OnInitializedAsync();
+    }
+
+    private async Task Save() {
+        byte[]? masterKey = AuthenticationService.MasterKey;
+        // Encrypt the Email and password before sending it to the API
+        PasswordPostBindingModel newPassDto =
+            new() {
+            UserId = PasswordPostBindingModel.UserId,
+            WebsiteName = PasswordPostBindingModel.WebsiteName,
+            Email = await CryptoInteropService.EncryptData(PasswordPostBindingModel.Email,masterKey),
+            Password = await CryptoInteropService.EncryptData(PasswordPostBindingModel.Password,masterKey)
+        };
+        await HttpService.Post("api/Manager/CreateNewPassword", newPassDto);
+        NavigationManager.NavigateTo("/");
+    }
+
+    private async Task GenerateStrongPassword(int length = 16)
+    {
+        Pw_Frontend.Application.Dtos.PasswordDto? password = await HttpService.Get<Pw_Frontend.Application.Dtos.PasswordDto>($"api/Manager/GenerateRandomPassword/{length}");
+        if (password == null)
+        {
+            return;
+        }
+        PasswordPostBindingModel.Password = password.Password;
+    }
+}

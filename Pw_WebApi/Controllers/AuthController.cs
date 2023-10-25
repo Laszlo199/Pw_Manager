@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Net;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Pw_Security.IServices;
 
 using Pw_WebApi.Dtos.AuthDto;
+using Pw_WebApi.Exceptions;
 
 namespace Pw_WebApi.Controllers;
 
@@ -21,8 +23,9 @@ public class AuthController : ControllerBase
     [HttpPost(nameof(Login))]
     public ActionResult<TokenDto> Login([FromBody] LoginDto loginDto)
     {
-        int userId; 
-        var token = _securityService.GenerateJwtToken(loginDto.Email, loginDto.Password, out userId);
+        var token = _securityService.GenerateJwtToken(loginDto.Email, loginDto.Password, out int userId);
+        if (userId == -1)
+            throw new RestException(HttpStatusCode.BadRequest, "Email or password are incorrect!");
         return new TokenDto
         {
             Jwt = token.Jwt,
@@ -37,11 +40,10 @@ public class AuthController : ControllerBase
     {
         var exists = _securityService.EmailExists(loginDto.Email);
         if(exists)
-            return BadRequest("Email already exists!");
+            throw new RestException(HttpStatusCode.BadRequest, "Email is already in use!");
         if (_securityService.Create(loginDto.Email, loginDto.Password))
         {
-            int userId;
-            var token = _securityService.GenerateJwtToken(loginDto.Email, loginDto.Password, out userId);
+            var token = _securityService.GenerateJwtToken(loginDto.Email, loginDto.Password, out int userId);
             return new TokenDto
             {
                 Jwt = token.Jwt,

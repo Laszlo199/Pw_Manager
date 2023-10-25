@@ -1,12 +1,8 @@
-﻿namespace Core.Models;
+﻿namespace PW_Frontend.Application.BindingModels;
 
-public class Passwords
-{
+public class PasswordPutBindingModel {
     public int Id { get; set; }
     public string WebsiteName { get; set; }
     public string Email { get; set; }
     public string Password { get; set; }
-    
-    public DateTime DateCreated { get; set; }
-    public User User { get; set; }
 }

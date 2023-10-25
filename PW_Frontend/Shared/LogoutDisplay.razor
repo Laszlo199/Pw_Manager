@@ -1,0 +1,26 @@
+﻿@using Pw_Frontend.Application.Services
+@using Pw_Frontend.Dtos.AuthDto
+@inject IAuthenticationService AuthenticationService
+@inject NavigationManager NavigationManager
+
+<button class="btn btn-secondary w-100" @onclick="Logout">Logout</button>
+
+@code {
+    private TokenDto? _tokenDto;
+    protected override void OnInitialized()
+    {
+        if (AuthenticationService.TokenDto != null)
+        {
+            _tokenDto = AuthenticationService.TokenDto;
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/login");
+        }
+    }
+    private async Task Logout()
+    {
+        await AuthenticationService.Logout();
+        _tokenDto = new TokenDto() { UserId = 0, Jwt = "" };
+    }
+}

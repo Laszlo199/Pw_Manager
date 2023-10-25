@@ -1,0 +1,81 @@
+﻿@page "/Update/{id:int}"
+@using Pw_Frontend.Application.Services
+@using Pw_Frontend.Application.Dtos
+@using PasswordDto = PW_Frontend.Application.Dtos.ManagerDto.PasswordDto
+@using PW_Frontend.Application.BindingModels
+@using PW_Frontend.Application.Services
+@inject IHttpService HttpService
+@inject NavigationManager NavigationManager
+@inject CryptoInteropService CryptoInteropService
+@inject IAuthenticationService AuthenticationService
+
+<div class="container card shadow rounded p-3 col-md-4">
+    <h3>Update</h3>
+    <EditForm Model="PasswordPutBindingModel">
+        <div class="form-floating">
+            <input type="text" class="form-control" @bind="PasswordPutBindingModel.WebsiteName"/>
+            <label>Website:</label>
+        </div>
+        <div class="form-floating">
+            <input type="email" class="form-control" @bind="PasswordPutBindingModel.Email"/>
+            <label>Email:</label>
+        </div>
+        <button class="btn btn-secondary w-100" @onclick="() => GenerateStrongPassword()">Generate strong password</button>
+        <div class="form-floating">
+            <input type="text" class="form-control" @bind="PasswordPutBindingModel.Password"/>
+            <label>Password:</label>
+        </div>
+        <div class="btn-group w-100 mt-3">
+            <button class="btn btn-primary" type="submit" @onclick="Save">Save password</button>
+        </div>
+    </EditForm>
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    
+    public PasswordPutBindingModel PasswordPutBindingModel { get; set; } = new PasswordPutBindingModel();
+
+    protected async override Task OnInitializedAsync()
+    {
+        int? userId = AuthenticationService.TokenDto?.UserId;
+        byte[]? masterKey = AuthenticationService.MasterKey;
+        if (userId is null || masterKey is null)
+        {
+            NavigationManager.NavigateTo("/Login");
+        }
+        
+        var passwordDto = await HttpService.Get<PasswordDto>($"api/Manager/GetPasswordById/{Id}");
+        if (passwordDto is null) {
+            return;
+        }
+        PasswordPutBindingModel.Id = passwordDto.Id;
+        
+        // Decrypt the email and password before displaying it to the user
+        PasswordPutBindingModel.Email = await CryptoInteropService.DecryptData(passwordDto.Email, masterKey);
+        PasswordPutBindingModel.Password = await CryptoInteropService.DecryptData(passwordDto.Password, masterKey);
+        PasswordPutBindingModel.WebsiteName = passwordDto.WebsiteName;
+        await base.OnInitializedAsync();
+    }
+    
+    private async Task Save() {
+        byte[]? masterKey = AuthenticationService.MasterKey;
+        var updatedPassDto = PasswordPutBindingModel;
+        // Encrypt the Email and password before sending it to the API
+        updatedPassDto.Email = await CryptoInteropService.EncryptData(updatedPassDto.Email, masterKey);
+        updatedPassDto.Password = await CryptoInteropService.EncryptData(updatedPassDto.Password, masterKey);
+        await HttpService.Put("api/Manager/UpdatePassword", updatedPassDto);
+        NavigationManager.NavigateTo("/");
+    }
+    
+    private async Task GenerateStrongPassword(int length = 16)
+    {
+        Pw_Frontend.Application.Dtos.PasswordDto? password = await HttpService.Get<Pw_Frontend.Application.Dtos.PasswordDto>($"api/Manager/GenerateRandomPassword/{length}");
+        if (password == null)
+        {
+            return;
+        }
+        PasswordPutBindingModel.Password = password.Password;
+    }
+}

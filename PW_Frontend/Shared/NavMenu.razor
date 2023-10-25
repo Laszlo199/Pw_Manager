@@ -1,0 +1,33 @@
+﻿<div class="@NavMenuCssClass nav-scrollable d-flex flex-column justify-content-between h-100" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <div class="">
+                <a class="navbar-brand m-0" href="">Pw_Frontend</a>
+                <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> Home
+            </NavLink>
+            <NavLink class="nav-link" href="/Create" Match="NavLinkMatch.All">
+                <span class="oi oi-plus" aria-hidden="true"></span> Add password
+            </NavLink>
+        </div>
+    </nav>
+    <div class="px-3 w-100">
+        <LogoutDisplay/>
+    </div>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
+}
