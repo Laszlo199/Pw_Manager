@@ -74,7 +74,7 @@ public class ManagerRepository: IManagerRepository
         return password;
     }
     
-    public string RandomPasswordGenerator(int length)
+    public GeneratedPasswordModel RandomPasswordGenerator(int length)
     {
      const string lowercaseChars = "abcdefghijklmnopqrstuvwxyz";
      const string uppercaseChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -102,7 +102,10 @@ public class ManagerRepository: IManagerRepository
         Random random = new();
         password = password.OrderBy(c => random.Next()).ToArray();
 
-        return new string(password);
+        return new GeneratedPasswordModel {
+            Password = new string(password),
+            Length = length
+        };
     }
 
     public PasswordModel GetPasswordById( int id) {

@@ -10,9 +10,9 @@ In this project, we implemented a password manager with a strong focus on securi
 
 
 3.	Further suggestions
--	Client-Side Decryption
--	Use the master password in the right way.
--	Implement the possibility of changing the login password
+-	Stretching the master key to 512 bits
+-	Updating the User's master password
+
 4.	Conclusion
 
   In general, this project has a good way to learn and practice. We've found some security problems and started fixing them, which makes our system safer and easier to use. To make our password manager even better, we need to keep looking for problems and fixing them. We also want to make sure that if something goes wrong, our system can handle it and stay strong. This will not only improve our system's safety but also make it more user-friendly.
@@ -20,12 +20,16 @@ In this project, we implemented a password manager with a strong focus on securi
   
 5.	How to run
    
-    a.	Backend
+    a. Backend
   
         1. cd Pw_WebApi
         2. dotnet run
+   
+    a. Frontend
+  
+        1. cd Pw_Frontend
+        2. dotnet run
        
-    If Swagger didn’t automatically open you can open Swagger by using this link: http://localhost:5284/swagger/index.html
 
 6. Group:
 

@@ -7,7 +7,7 @@ public interface IManagerService {
     PasswordModel Create(PasswordModel newPassword);
     void Delete(int passwordId);
     PasswordModel Update(PasswordModel password);
-    string RandomPasswordGenerator(int length);
+    GeneratedPasswordModel RandomPasswordGenerator(int length);
     PasswordModel GetPasswordById(int id);
     
 

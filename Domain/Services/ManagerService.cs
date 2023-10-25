@@ -35,7 +35,7 @@ public class ManagerService: IManagerService {
         return _repo.Update(password);
     }
 
-    public string RandomPasswordGenerator(int length) {
+    public GeneratedPasswordModel RandomPasswordGenerator(int length) {
         return _repo.RandomPasswordGenerator(length);
     }
 

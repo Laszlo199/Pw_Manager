@@ -24,7 +24,7 @@ public class ManagerSeeder
         var websiteName = "Gmail";
         var websiteName2 = "Facebook";
         var transformer = new Transformer.Transformer();
-        var user1 = new UserEntity()
+        var user1 = new UserEntity
         {
             Email = transformer.EncryptPassword(email),
             PasswordHash = new byte[64],

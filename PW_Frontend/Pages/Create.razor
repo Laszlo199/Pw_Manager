@@ -1,6 +1,7 @@
 ﻿@page "/Create"
 @using Pw_Frontend.Application.Services
 @using PW_Frontend.Application.BindingModels
+@using PW_Frontend.Application.Dtos.ManagerDto
 @using PW_Frontend.Application.Services
 @inject IAuthenticationService AuthenticationService
 @inject NavigationManager NavigationManager
@@ -57,11 +58,11 @@
 
     private async Task GenerateStrongPassword(int length = 16)
     {
-        var password = await HttpService.Get<string>($"api/Manager/GenerateRandomPassword/{length}");
+        Pw_Frontend.Application.Dtos.PasswordDto? password = await HttpService.Get<Pw_Frontend.Application.Dtos.PasswordDto>($"api/Manager/GenerateRandomPassword/{length}");
         if (password == null)
         {
             return;
         }
-        PasswordPostBindingModel.Password = password;
+        PasswordPostBindingModel.Password = password.Password;
     }
 }
