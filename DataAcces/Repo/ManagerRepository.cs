@@ -44,8 +44,6 @@ public class ManagerRepository: IManagerRepository
             DateCreated = DateTime.Today,
             UserEntity = userEntity
         };
-        Console.WriteLine($"Email: {model.Email}");
-        Console.WriteLine($"Password: {model.Password}");
         _ctx.Attach(model).State = EntityState.Added;
         _ctx.SaveChanges();
         return newPassword;

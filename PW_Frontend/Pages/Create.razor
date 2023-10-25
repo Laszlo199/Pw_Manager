@@ -55,10 +55,6 @@
             Email = await CryptoInteropService.EncryptData(PasswordPostBindingModel.Email,masterKey),
             Password = await CryptoInteropService.EncryptData(PasswordPostBindingModel.Password,masterKey)
         };
-        Console.WriteLine($"UserId: \"{newPassDto.UserId}\"");
-        Console.WriteLine($"Website: \"{newPassDto.WebsiteName}\"");
-        Console.WriteLine($"Email: \"{newPassDto.Email}\"");
-        Console.WriteLine($"Password: \"{newPassDto.Password}\"");
         await HttpService.Post("api/Manager/CreateNewPassword", newPassDto);
         NavigationManager.NavigateTo("/");
     }
