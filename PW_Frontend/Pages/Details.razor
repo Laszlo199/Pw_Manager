@@ -39,6 +39,8 @@
         if (passwordDto is null) {
             return;
         }
+        // Decrypt the email and password before displaying it to the user
+        passwordDto.Email = await CryptoInteropService.DecryptData(passwordDto.Email, masterKey);
         passwordDto.Password = await CryptoInteropService.DecryptData(passwordDto.Password, masterKey);
         PasswordDto = passwordDto;
         await base.OnInitializedAsync();

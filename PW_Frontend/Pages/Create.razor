@@ -46,13 +46,20 @@
     }
 
     private async Task Save() {
-        var newPassDto = PasswordPostBindingModel;
         byte[]? masterKey = AuthenticationService.MasterKey;
-        
-        string keyHex = BitConverter.ToString(masterKey).Replace("-", "").ToLower();
-        
-        newPassDto.Password = await CryptoInteropService.EncryptData(newPassDto.Password,masterKey);
-        await HttpService.Post("api/Manager/CreateNewPassword", PasswordPostBindingModel);
+        // Encrypt the Email and password before sending it to the API
+        PasswordPostBindingModel newPassDto =
+            new() {
+            UserId = PasswordPostBindingModel.UserId,
+            WebsiteName = PasswordPostBindingModel.WebsiteName,
+            Email = await CryptoInteropService.EncryptData(PasswordPostBindingModel.Email,masterKey),
+            Password = await CryptoInteropService.EncryptData(PasswordPostBindingModel.Password,masterKey)
+        };
+        Console.WriteLine($"UserId: \"{newPassDto.UserId}\"");
+        Console.WriteLine($"Website: \"{newPassDto.WebsiteName}\"");
+        Console.WriteLine($"Email: \"{newPassDto.Email}\"");
+        Console.WriteLine($"Password: \"{newPassDto.Password}\"");
+        await HttpService.Post("api/Manager/CreateNewPassword", newPassDto);
         NavigationManager.NavigateTo("/");
     }
 

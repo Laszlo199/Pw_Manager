@@ -62,8 +62,9 @@ public class HttpService : IHttpService
     public async Task Post(string uri, object? body = null)
     {
         var request = new HttpRequestMessage(HttpMethod.Post, uri);
-        if (body != null)
+        if (body != null) {
             request.Content = new StringContent(JsonSerializer.Serialize(body), Encoding.UTF8, "application/json");
+        }
         await SendRequest(request);
     }
 

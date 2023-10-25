@@ -40,8 +40,8 @@
     protected async override Task OnInitializedAsync()
     {
         int? userId = AuthenticationService.TokenDto?.UserId;
-        byte[]? stretchedKey = AuthenticationService.MasterKey;
-        if (userId is null || stretchedKey is null)
+        byte[]? masterKey = AuthenticationService.MasterKey;
+        if (userId is null || masterKey is null)
         {
             NavigationManager.NavigateTo("/Login");
         }
@@ -51,16 +51,20 @@
             return;
         }
         PasswordPutBindingModel.Id = passwordDto.Id;
-        PasswordPutBindingModel.Password = await CryptoInteropService.DecryptData(passwordDto.Password, stretchedKey);
-        PasswordPutBindingModel.Email = passwordDto.Email;
+        
+        // Decrypt the email and password before displaying it to the user
+        PasswordPutBindingModel.Email = await CryptoInteropService.DecryptData(passwordDto.Email, masterKey);
+        PasswordPutBindingModel.Password = await CryptoInteropService.DecryptData(passwordDto.Password, masterKey);
         PasswordPutBindingModel.WebsiteName = passwordDto.WebsiteName;
         await base.OnInitializedAsync();
     }
     
     private async Task Save() {
-        byte[]? stretchedKey = AuthenticationService.MasterKey;
+        byte[]? masterKey = AuthenticationService.MasterKey;
         var updatedPassDto = PasswordPutBindingModel;
-        updatedPassDto.Password = await CryptoInteropService.EncryptData(updatedPassDto.Password, stretchedKey);
+        // Encrypt the Email and password before sending it to the API
+        updatedPassDto.Email = await CryptoInteropService.EncryptData(updatedPassDto.Email, masterKey);
+        updatedPassDto.Password = await CryptoInteropService.EncryptData(updatedPassDto.Password, masterKey);
         await HttpService.Put("api/Manager/UpdatePassword", updatedPassDto);
         NavigationManager.NavigateTo("/");
     }

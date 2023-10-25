@@ -18,37 +18,45 @@ public class ManagerSeeder
         _context.Database.EnsureCreated();
         _context.SaveChanges();
         
-        var password = "password123";
-        var password2 = "asd123";
-        var email = "user1@gmail.com";
-        var websiteName = "Gmail";
-        var websiteName2 = "Facebook";
-        var transformer = new Transformer.Transformer();
-        var user1 = new UserEntity
-        {
-            Email = transformer.EncryptPassword(email),
-            PasswordHash = new byte[64],
-            PasswordSalt = new byte[64]
+        const string websiteName = "VeryLegitWebsite.com";
+        const string email = "3rJKnD1u9vjXYZ64/nJNFOxnaCUHKJp/6Ix6A11yQlA=";
+        const string password = "byIl5GvwHpkIYxXejybIOT9KlLlnlZCqLGSUQdxwQ5Y=";
+        
+        const string websiteName2 = "Facebook";
+        const string email2 = "tD19HGRtoA6Co4pHW+d2xD9KlLlnlZCqLGSUQdxwQ5Y=";
+        const string password2 = "NCcm1qx0QIHNxGHgdpzkVz9KlLlnlZCqLGSUQdxwQ5Y=";
+        
+        const string userEmail = "user@gmail.com";
+        const string userPassHash = "Si50ZDKhK6bqi83VLA15+Fg34SiPsCsW5raC1cHxnTr4OAxolduahOEURX+ohXiUGE7VswmLWRgYcjYfdhUbGA==";
+        const string userSaltHash = "Y7XVEOVXI1ANxdjzacrv6Q==";
+        
+        UserEntity user1 = new() {
+            Email = userEmail,
+            PasswordHash = Convert.FromBase64String(userPassHash),
+            PasswordSalt = Convert.FromBase64String(userSaltHash)
         };
 
         _context.Add(user1);
-        _context.Passwords.Add(new PasswordEntity()
+        
+        _context.Passwords.Add(new PasswordEntity
         {
-            WebsiteName = transformer.EncryptPassword(websiteName),
-            Email = transformer.EncryptPassword(email),
-            Password = transformer.EncryptPassword(password),
+            WebsiteName = websiteName,
+            Email = email,
+            Password = password,
             DateCreated = DateTime.Today,
             UserEntity = user1,
         });
         
-        _context.Passwords.Add(new PasswordEntity()
+        _context.Passwords.Add(new PasswordEntity
         {
-            WebsiteName = transformer.EncryptPassword(websiteName2),
-            Email = transformer.EncryptPassword(email),
-            Password = transformer.EncryptPassword(password2),
+            WebsiteName = websiteName2,
+            Email = email2,
+            Password = password2,
             DateCreated = DateTime.Today,
             UserEntity = user1,
         });
+       
+        
         _context.SaveChanges();
     }
 }
